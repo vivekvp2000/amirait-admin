@@ -27,23 +27,20 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
 
 const Invoice = () => {
-  // For Daynamic Row
-  const [rows, setRows] = useState([
-    {
-      qty: "",
-      item: "",
-      description: "",
-      unitPrice: "",
-      discount: "",
-      lineTotal: "",
-    },
-  ]);
-  // For Add Row
-  const handleAddRow = () => {
-    setRows([
-      ...rows,
+  // For form data including items
+  const [formData, setFormData] = useState({
+    invoice_date: "",
+    customer_name: "",
+    customer_address: "",
+    customer_phone: "",
+    payment_due_date: "",
+    sales_person: "",
+    delivery_date: "",
+    payment_method: "",
+    items: [
       {
         qty: "",
         item: "",
@@ -52,24 +49,60 @@ const Invoice = () => {
         discount: "",
         lineTotal: "",
       },
-    ]);
-  };
-  // For Get Form Data
-  const [formData, setFormData] = useState({
-    invoiceDate: "",
-    custmorName: "",
-    address: "",
-    phone: "",
-    paymentDue: "",
-    salesPerson: "",
-    deliveryDate: "",
-    paymentMethod: "",
+    ],
   });
-  // change form data
+
+  // Handle form data change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  // Handle dynamic row change (for items)
+  const handleRowChange = (e, index) => {
+    const { name, value } = e.target;
+    const updatedItems = formData.items.map((item, i) =>
+      i === index ? { ...item, [name]: value } : item
+    );
+    setFormData({ ...formData, items: updatedItems });
+  };
+
+  // Handle add new row
+  const handleAddRow = () => {
+    setFormData({
+      ...formData,
+      items: [
+        ...formData.items,
+        {
+          qty: "",
+          item: "",
+          description: "",
+          unitPrice: "",
+          discount: "",
+          lineTotal: "",
+        },
+      ],
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/payment/store/invoice`,
+        formData,
+        {
+          headers: {
+            Authorization: `${import.meta.env.VITE_API_TOKEN}`,
+          },
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <div className="flex items-center">
@@ -100,7 +133,7 @@ const Invoice = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label
@@ -114,9 +147,9 @@ const Invoice = () => {
                     type="date"
                     id="invoice-date"
                     placeholder="Date"
-                    name="invoiceDate"
+                    name="invoice_date"
                     onChange={handleChange}
-                    value={formData.invoiceDate}
+                    value={formData.invoice_date}
                   />
                 </div>
                 <div>
@@ -130,9 +163,9 @@ const Invoice = () => {
                     type="text"
                     id="name"
                     placeholder="Enter Your Name"
-                    name="custmorName"
+                    name="customer_name"
                     onChange={handleChange}
-                    value={formData.custmorName}
+                    value={formData.customer_name}
                   />
                 </div>
                 <div>
@@ -143,12 +176,12 @@ const Invoice = () => {
                     Address
                   </label>
                   <Input
-                    type="email"
+                    type="text"
                     id="address"
                     placeholder="Enter Address"
-                    name="address"
+                    name="customer_address"
                     onChange={handleChange}
-                    value={formData.address}
+                    value={formData.customer_address}
                   />
                 </div>
                 <div>
@@ -161,9 +194,9 @@ const Invoice = () => {
                   <Input
                     type="number"
                     id="number"
-                    name="phone"
+                    name="customer_phone"
                     onChange={handleChange}
-                    value={formData.phone}
+                    value={formData.customer_phone}
                     placeholder="Enter Your Number"
                   />
                 </div>
@@ -178,8 +211,8 @@ const Invoice = () => {
                     type="date"
                     id="payment-due"
                     placeholder="Enter Date"
-                    name="paymentDue"
-                    value={formData.paymentDue}
+                    name="payment_due_date"
+                    value={formData.payment_due_date}
                     onChange={handleChange}
                   />
                 </div>
@@ -194,9 +227,9 @@ const Invoice = () => {
                     type="text"
                     id="sales-person"
                     placeholder="Enter Your Name"
-                    value={formData.salesPerson}
+                    value={formData.sales_person}
                     onChange={handleChange}
-                    name="salesPerson"
+                    name="sales_person"
                   />
                 </div>
                 <div>
@@ -209,9 +242,9 @@ const Invoice = () => {
                   <Input
                     type="date"
                     id="delivery-date"
-                    name="deliveryDate"
+                    name="delivery_date"
                     onChange={handleChange}
-                    value={formData.deliveryDate}
+                    value={formData.delivery_date}
                     placeholder="Enter Delivery Date"
                   />
                 </div>
@@ -226,14 +259,15 @@ const Invoice = () => {
                     type="text"
                     id="payment-method"
                     placeholder="Enter Payment Method"
-                    name="paymentMethod"
-                    value={formData.paymentMethod}
+                    name="payment_method"
+                    value={formData.payment_method}
                     onChange={handleChange}
                   />
                 </div>
               </div>
-              <div className="overflow-x-auto mt-4">
-                <Table className="min-w-full border border-gray-200 ">
+
+              <div className="mt-4">
+                <Table className="border border-gray-200 rounded-md">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="font-bold text-black dark:text-white">
@@ -242,7 +276,7 @@ const Invoice = () => {
                       <TableHead className="font-bold text-black dark:text-white">
                         Item
                       </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white">
+                      <TableHead className="font-bold text-black dark:text-white w-[250px]">
                         Description
                       </TableHead>
                       <TableHead className="font-bold text-black dark:text-white">
@@ -260,102 +294,60 @@ const Invoice = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {rows.map((row, index) => (
+                    {formData.items.map((row, index) => (
                       <TableRow key={index}>
                         <TableCell>
                           <Input
                             type="text"
                             placeholder="Qty"
+                            name="qty"
                             value={row.qty}
-                            onChange={(e) =>
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index
-                                    ? { ...r, qty: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
+                            onChange={(e) => handleRowChange(e, index)}
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="text"
                             placeholder="Enter Item Name"
+                            name="item"
                             value={row.item}
-                            onChange={(e) =>
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index
-                                    ? { ...r, item: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
+                            onChange={(e) => handleRowChange(e, index)}
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="text"
                             placeholder="Enter Description"
+                            name="description"
                             value={row.description}
-                            onChange={(e) =>
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index
-                                    ? { ...r, description: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
+                            onChange={(e) => handleRowChange(e, index)}
                           />
                         </TableCell>
                         <TableCell>
                           <Input
-                            type="text"
+                            type="number"
                             placeholder="Enter Unit Price ₹"
+                            name="unitPrice"
                             value={row.unitPrice}
-                            onChange={(e) =>
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index
-                                    ? { ...r, unitPrice: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
+                            onChange={(e) => handleRowChange(e, index)}
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="text"
                             placeholder="Enter Discount"
+                            name="discount"
                             value={row.discount}
-                            onChange={(e) =>
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index
-                                    ? { ...r, discount: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
+                            onChange={(e) => handleRowChange(e, index)}
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
                             placeholder="Enter Line Total"
+                            name="lineTotal"
                             value={row.lineTotal}
-                            onChange={(e) =>
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index
-                                    ? { ...r, lineTotal: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
+                            onChange={(e) => handleRowChange(e, index)}
                           />
                         </TableCell>
                         <TableCell className="text-center">
@@ -368,6 +360,9 @@ const Invoice = () => {
                   </TableBody>
                 </Table>
               </div>
+              <Button type="submit" className="mt-4">
+                Submit
+              </Button>
             </form>
           </CardContent>
         </Card>
