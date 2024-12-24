@@ -1,4 +1,3 @@
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 import {
@@ -22,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Link, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { useTheme } from "@/components/theme-provider";
 import logo from "@assets/images/logo.png";
 
@@ -52,20 +51,28 @@ const DashboardLayout = () => {
             </div>
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                <Link
+                <NavLink
                   to="/"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={({ isActive }) =>
+                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                      isActive ? "text-theme" : ""
+                    }`
+                  }
                 >
                   <Home className="h-4 w-4" />
                   Dashboard
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/invoice"
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={({ isActive }) =>
+                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                      isActive ? "text-theme" : ""
+                    }`
+                  }
                 >
                   <File className="h-4 w-4" />
                   Invoice
-                </Link>
+                </NavLink>
               </nav>
             </div>
           </div>

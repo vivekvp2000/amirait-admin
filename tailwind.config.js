@@ -10,6 +10,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        theme: "#384bff",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -52,7 +53,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Jost", "sans-serif"], 
+        sans: ["Jost", "sans-serif"],
       },
     },
   },
