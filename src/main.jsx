@@ -11,12 +11,17 @@ import "@fontsource/jost/300.css"; // Light weight
 import "@fontsource/jost/700.css"; // Bold weight
 // Google Font
 
+// Create a client
+// const queryClient = new QueryClient();
+
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <StrictMode>
+      {/* <QueryClientProvider client={queryClient}> */}
       <ThemeProvider>
         <App />
       </ThemeProvider>
+      {/* </QueryClientProvider> */}
     </StrictMode>
   </BrowserRouter>
 );

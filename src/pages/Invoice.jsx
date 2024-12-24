@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
+import { addInvoice } from "@/http/api";
 
 const Invoice = () => {
   // For form data including items
@@ -84,6 +85,13 @@ const Invoice = () => {
       ],
     });
   };
+
+  // const mutation = useMutation({
+  //   mutationFn: addInvoice,
+  //   onSuccess: (data) => {
+  //     console.log(data);
+  //   },
+  // });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -150,6 +158,7 @@ const Invoice = () => {
                     name="invoice_date"
                     onChange={handleChange}
                     value={formData.invoice_date}
+                    required
                   />
                 </div>
                 <div>
@@ -166,6 +175,7 @@ const Invoice = () => {
                     name="customer_name"
                     onChange={handleChange}
                     value={formData.customer_name}
+                    required
                   />
                 </div>
                 <div>
@@ -182,6 +192,7 @@ const Invoice = () => {
                     name="customer_address"
                     onChange={handleChange}
                     value={formData.customer_address}
+                    required
                   />
                 </div>
                 <div>
@@ -198,6 +209,7 @@ const Invoice = () => {
                     onChange={handleChange}
                     value={formData.customer_phone}
                     placeholder="Enter Your Number"
+                    required
                   />
                 </div>
                 <div>
@@ -214,6 +226,7 @@ const Invoice = () => {
                     name="payment_due_date"
                     value={formData.payment_due_date}
                     onChange={handleChange}
+                    required
                   />
                 </div>
                 <div>
@@ -230,6 +243,7 @@ const Invoice = () => {
                     value={formData.sales_person}
                     onChange={handleChange}
                     name="sales_person"
+                    required
                   />
                 </div>
                 <div>
@@ -245,6 +259,7 @@ const Invoice = () => {
                     name="delivery_date"
                     onChange={handleChange}
                     value={formData.delivery_date}
+                    required
                     placeholder="Enter Delivery Date"
                   />
                 </div>
@@ -259,6 +274,7 @@ const Invoice = () => {
                     type="text"
                     id="payment-method"
                     placeholder="Enter Payment Method"
+                    required
                     name="payment_method"
                     value={formData.payment_method}
                     onChange={handleChange}
@@ -303,6 +319,7 @@ const Invoice = () => {
                             name="qty"
                             value={row.qty}
                             onChange={(e) => handleRowChange(e, index)}
+                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -312,6 +329,7 @@ const Invoice = () => {
                             name="item"
                             value={row.item}
                             onChange={(e) => handleRowChange(e, index)}
+                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -321,6 +339,7 @@ const Invoice = () => {
                             name="description"
                             value={row.description}
                             onChange={(e) => handleRowChange(e, index)}
+                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -330,6 +349,7 @@ const Invoice = () => {
                             name="unitPrice"
                             value={row.unitPrice}
                             onChange={(e) => handleRowChange(e, index)}
+                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -339,6 +359,7 @@ const Invoice = () => {
                             name="discount"
                             value={row.discount}
                             onChange={(e) => handleRowChange(e, index)}
+                            required
                           />
                         </TableCell>
                         <TableCell>
@@ -348,6 +369,7 @@ const Invoice = () => {
                             name="lineTotal"
                             value={row.lineTotal}
                             onChange={(e) => handleRowChange(e, index)}
+                            required
                           />
                         </TableCell>
                         <TableCell className="text-center">
@@ -360,7 +382,10 @@ const Invoice = () => {
                   </TableBody>
                 </Table>
               </div>
-              <Button type="submit" className="mt-4">
+              <Button
+                type="submit"
+                className="mt-4 bg-green-600 font-extrabold"
+              >
                 Submit
               </Button>
             </form>
