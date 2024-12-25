@@ -25,12 +25,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import axios from "axios";
-import { addInvoice } from "@/http/api";
+import { useAddInvoiceMutation } from "@/store/slices/apiSlice";
 
 const Invoice = () => {
+  // Post Invoice
+  const [addInvoice, { isLoading, isError }] = useAddInvoiceMutation();
+
   // For form data including items
   const [formData, setFormData] = useState({
     invoice_date: "",
@@ -96,18 +98,10 @@ const Invoice = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/payment/store/invoice`,
-        formData,
-        {
-          headers: {
-            Authorization: `${import.meta.env.VITE_API_TOKEN}`,
-          },
-        }
-      );
-      console.log(response);
+      const response = await addInvoice(formData).unwrap();
+      console.log("Response:", response);
     } catch (error) {
-      console.log(error);
+      console.error("Error:", error);
     }
   };
 
@@ -385,8 +379,13 @@ const Invoice = () => {
               <Button
                 type="submit"
                 className="mt-4 bg-green-600 font-extrabold"
+                disabled={isLoading}
               >
-                Submit
+                {isLoading ? (
+                  <LoaderCircle className="animate-spin" />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </form>
           </CardContent>
