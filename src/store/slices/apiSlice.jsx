@@ -6,7 +6,7 @@ export const apiSlice = createApi({
   endpoints: (builder) => ({
     addInvoice: builder.mutation({
       query: (formData) => ({
-        url: "/payment/store/invdoice",
+        url: "/payment/store/invoice",
         method: "POST",
         body: formData,
         headers: {
@@ -14,6 +14,15 @@ export const apiSlice = createApi({
         },
       }),
     }),
+    getInvoices: builder.query({
+      query: () => ({
+        url: "payment/view/all/invoicess",
+        method: "GET",
+        headers: {
+          Authorization: import.meta.env.VITE_API_TOKEN,
+        },
+      })
+    })
   }),
 });
-export const { useAddInvoiceMutation } = apiSlice;
+export const { useGetInvoicesQuery, useAddInvoiceMutation } = apiSlice;

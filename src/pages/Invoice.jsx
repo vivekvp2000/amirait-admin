@@ -1,6 +1,7 @@
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -25,13 +26,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CirclePlus, LoaderCircle } from "lucide-react";
+import { CirclePlus, Download, LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { useAddInvoiceMutation } from "@/store/slices/apiSlice";
+import { useAddInvoiceMutation, useGetInvoicesQuery } from "@/store/slices/apiSlice";
+import { toast } from "react-toastify";
 
 const Invoice = () => {
-  // Post Invoice
-  const [addInvoice, { isLoading, isError }] = useAddInvoiceMutation();
+  const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery()
+  const [addInvoice, { isLoading, error }] = useAddInvoiceMutation();
+
+  const [showInvoice, setShowInvoice] = useState(false);
 
   // For form data including items
   const [formData, setFormData] = useState({
@@ -88,26 +92,27 @@ const Invoice = () => {
     });
   };
 
-  // const mutation = useMutation({
-  //   mutationFn: addInvoice,
-  //   onSuccess: (data) => {
-  //     console.log(data);
-  //   },
-  // });
-
+  // Form Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await addInvoice(formData).unwrap();
       console.log("Response:", response);
+      toast.success("Invoice added successfully!");
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error:", error.data.errors);
+      toast.error(error.data.message);
     }
   };
 
+  const handleShowInvoice = () => {
+    setShowInvoice(() => {
+      return !showInvoice
+    })
+  }
   return (
     <>
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -119,275 +124,341 @@ const Invoice = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+        <div>
+          <Button onClick={handleShowInvoice}>
+            {showInvoice ? 'Cancel' : <><CirclePlus /> Add Invoice</>}
+          </Button>
+
+        </div>
+      </div>
+
+      <div>
+        {
+          showInvoice && <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <h2 className="text-2xl font-semibold leading-none tracking-tight">
+                    Invoice
+                  </h2>
+                </CardTitle>
+                <CardDescription>
+                  <p className="text-sm text-muted-foreground">
+                    Create Your Invoice Here
+                  </p>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="invoice-date"
+                        id="date"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Invoice Date
+                      </label>
+                      <Input
+                        type="date"
+                        id="invoice-date"
+                        placeholder="Date"
+                        name="invoice_date"
+                        onChange={handleChange}
+                        value={formData.invoice_date}
+                        className={`${error?.data?.errors?.invoice_date && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.invoice_date && <span className="text-red-500 text-sm">{error?.data?.errors?.invoice_date?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Customer Name
+                      </label>
+                      <Input
+                        type="text"
+                        id="name"
+                        placeholder="Enter Your Name"
+                        name="customer_name"
+                        onChange={handleChange}
+                        value={formData.customer_name}
+                        className={`${error?.data?.errors?.customer_name && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.customer_name && <span className="text-red-500 text-sm">{error?.data?.errors?.customer_name?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="address"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Address
+                      </label>
+                      <Input
+                        type="text"
+                        id="address"
+                        placeholder="Enter Address"
+                        name="customer_address"
+                        onChange={handleChange}
+                        value={formData.customer_address}
+                        className={`${error?.data?.errors?.customer_address && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.customer_address && <span className="text-red-500 text-sm">{error?.data?.errors?.customer_address?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="number"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Phone
+                      </label>
+                      <Input
+                        type="number"
+                        id="number"
+                        name="customer_phone"
+                        onChange={handleChange}
+                        value={formData.customer_phone}
+                        placeholder="Enter Your Number"
+                        className={`${error?.data?.errors?.customer_phone && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.customer_phone && <span className="text-red-500 text-sm">{error?.data?.errors?.customer_phone?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="payment-due"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Payment Due
+                      </label>
+                      <Input
+                        type="date"
+                        id="payment-due"
+                        placeholder="Enter Date"
+                        name="payment_due_date"
+                        value={formData.payment_due_date}
+                        onChange={handleChange}
+                        className={`${error?.data?.errors?.payment_due_date && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.payment_due_date && <span className="text-red-500 text-sm">{error?.data?.errors?.payment_due_date?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="sales-person"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Sales person
+                      </label>
+                      <Input
+                        type="text"
+                        id="sales-person"
+                        placeholder="Enter Your Name"
+                        value={formData.sales_person}
+                        onChange={handleChange}
+                        name="sales_person"
+                        className={`${error?.data?.errors?.sales_person && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.sales_person && <span className="text-red-500 text-sm">{error?.data?.errors?.sales_person?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="delivery-date"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Delivery Date
+                      </label>
+                      <Input
+                        type="date"
+                        id="delivery-date"
+                        name="delivery_date"
+                        onChange={handleChange}
+                        value={formData.delivery_date}
+                        placeholder="Enter Delivery Date"
+                        className={`${error?.data?.errors?.delivery_date && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.delivery_date && <span className="text-red-500 text-sm">{error?.data?.errors?.delivery_date?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="payment-method"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Payment Method
+                      </label>
+                      <Input
+                        type="text"
+                        id="payment-method"
+                        placeholder="Enter Payment Method"
+                        name="payment_method"
+                        value={formData.payment_method}
+                        onChange={handleChange}
+                        className={`${error?.data?.errors?.payment_method && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.payment_method && <span className="text-red-500 text-sm">{error?.data?.errors?.payment_method?.join('')}</span>}
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <Table className="border light:border-gray-200 rounded-md">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="font-bold text-black dark:text-white">
+                            Qty.
+                          </TableHead>
+                          <TableHead className="font-bold text-black dark:text-white">
+                            Item
+                          </TableHead>
+                          <TableHead className="font-bold text-black dark:text-white w-[250px]">
+                            Description
+                          </TableHead>
+                          <TableHead className="font-bold text-black dark:text-white">
+                            Unit Price
+                          </TableHead>
+                          <TableHead className="font-bold text-black dark:text-white">
+                            Discount
+                          </TableHead>
+                          <TableHead className="font-bold text-black dark:text-white">
+                            Line Total
+                          </TableHead>
+                          <TableHead className="font-bold text-black dark:text-white">
+                            Add
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {formData.items.map((row, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <Input
+                                type="text"
+                                placeholder="Qty"
+                                name="qty"
+                                value={row.qty}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="text"
+                                placeholder="Enter Item Name"
+                                name="item"
+                                value={row.item}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="text"
+                                placeholder="Enter Description"
+                                name="description"
+                                value={row.description}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                placeholder="Enter Unit Price ₹"
+                                name="unitPrice"
+                                value={row.unitPrice}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="text"
+                                placeholder="Enter Discount"
+                                name="discount"
+                                value={row.discount}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                placeholder="Enter Line Total"
+                                name="lineTotal"
+                                value={row.lineTotal}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                                readonly
+                              />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Button type="button" onClick={handleAddRow}>
+                                <CirclePlus size={20} />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="mt-4 bg-green-600 font-extrabold"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      "Submit"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        }
       </div>
       <div>
+        {
+          isInvoiceLoading && <h4>Invoice List Loading....</h4>
+        }
         <Card>
           <CardHeader>
             <CardTitle>
               <h2 className="text-2xl font-semibold leading-none tracking-tight">
-                Invoice
+                All  Invoice
               </h2>
             </CardTitle>
             <CardDescription>
               <p className="text-sm text-muted-foreground">
-                Create Your Invoice Here
+                All Invoice List
               </p>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="invoice-date"
-                    id="date"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Invoice Date
-                  </label>
-                  <Input
-                    type="date"
-                    id="invoice-date"
-                    placeholder="Date"
-                    name="invoice_date"
-                    onChange={handleChange}
-                    value={formData.invoice_date}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Customer Name
-                  </label>
-                  <Input
-                    type="text"
-                    id="name"
-                    placeholder="Enter Your Name"
-                    name="customer_name"
-                    onChange={handleChange}
-                    value={formData.customer_name}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="address"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Address
-                  </label>
-                  <Input
-                    type="text"
-                    id="address"
-                    placeholder="Enter Address"
-                    name="customer_address"
-                    onChange={handleChange}
-                    value={formData.customer_address}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="number"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Phone
-                  </label>
-                  <Input
-                    type="number"
-                    id="number"
-                    name="customer_phone"
-                    onChange={handleChange}
-                    value={formData.customer_phone}
-                    placeholder="Enter Your Number"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="payment-due"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Payment Due
-                  </label>
-                  <Input
-                    type="date"
-                    id="payment-due"
-                    placeholder="Enter Date"
-                    name="payment_due_date"
-                    value={formData.payment_due_date}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="sales-person"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Sales person
-                  </label>
-                  <Input
-                    type="text"
-                    id="sales-person"
-                    placeholder="Enter Your Name"
-                    value={formData.sales_person}
-                    onChange={handleChange}
-                    name="sales_person"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="delivery-date"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Delivery Date
-                  </label>
-                  <Input
-                    type="date"
-                    id="delivery-date"
-                    name="delivery_date"
-                    onChange={handleChange}
-                    value={formData.delivery_date}
-                    required
-                    placeholder="Enter Delivery Date"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="payment-method"
-                    className="block mb-2 text-sm font-semibold text-gray"
-                  >
-                    Payment Method
-                  </label>
-                  <Input
-                    type="text"
-                    id="payment-method"
-                    placeholder="Enter Payment Method"
-                    required
-                    name="payment_method"
-                    value={formData.payment_method}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <Table className="border border-gray-200 rounded-md">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="font-bold text-black dark:text-white">
-                        Qty.
-                      </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white">
-                        Item
-                      </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white w-[250px]">
-                        Description
-                      </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white">
-                        Unit Price
-                      </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white">
-                        Discount
-                      </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white">
-                        Line Total
-                      </TableHead>
-                      <TableHead className="font-bold text-black dark:text-white">
-                        Add
-                      </TableHead>
+            <Table className='w-full border light:border-gray-200'>
+              <TableCaption>A list of your recent invoices.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center font-bold text-black dark:text-white">Customer Id</TableHead>
+                  <TableHead className="text-center font-bold text-black dark:text-white">Customer Name</TableHead>
+                  <TableHead className="text-center font-bold text-black dark:text-white">Delivery Date</TableHead>
+                  <TableHead className="text-center font-bold text-black dark:text-white">Sales Person</TableHead>
+                  <TableHead className="text-center font-bold text-black dark:text-white">Export</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {
+                  allInvoice?.data?.map((invoice, index) => {
+                    return <TableRow key={index}>
+                      <TableCell className="text-center font-medium">{invoice?.customer_id ? invoice?.customer_id : '---'}</TableCell>
+                      <TableCell className="text-center">{invoice?.customer_name}</TableCell>
+                      <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
+                      <TableCell className="text-center">{invoice?.sales_person}</TableCell>
+                      <TableCell className="text-center"><Button className="bg-green-700 dark:text-white"> <Download /></Button></TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {formData.items.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Input
-                            type="text"
-                            placeholder="Qty"
-                            name="qty"
-                            value={row.qty}
-                            onChange={(e) => handleRowChange(e, index)}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="text"
-                            placeholder="Enter Item Name"
-                            name="item"
-                            value={row.item}
-                            onChange={(e) => handleRowChange(e, index)}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="text"
-                            placeholder="Enter Description"
-                            name="description"
-                            value={row.description}
-                            onChange={(e) => handleRowChange(e, index)}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            placeholder="Enter Unit Price ₹"
-                            name="unitPrice"
-                            value={row.unitPrice}
-                            onChange={(e) => handleRowChange(e, index)}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="text"
-                            placeholder="Enter Discount"
-                            name="discount"
-                            value={row.discount}
-                            onChange={(e) => handleRowChange(e, index)}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input
-                            type="number"
-                            placeholder="Enter Line Total"
-                            name="lineTotal"
-                            value={row.lineTotal}
-                            onChange={(e) => handleRowChange(e, index)}
-                            required
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Button type="button" onClick={handleAddRow}>
-                            <CirclePlus size={20} />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <Button
-                type="submit"
-                className="mt-4 bg-green-600 font-extrabold"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <LoaderCircle className="animate-spin" />
-                ) : (
-                  "Submit"
-                )}
-              </Button>
-            </form>
+                  })
+                }
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
