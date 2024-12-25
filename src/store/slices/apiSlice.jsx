@@ -22,7 +22,16 @@ export const apiSlice = createApi({
           Authorization: import.meta.env.VITE_API_TOKEN,
         },
       })
+    }),
+    getInvoice: builder.query({
+      query: (id) => ({
+        url: `payment/view/invoice/${id}`,
+        method: "GET",
+        headers: {
+          Authorization: import.meta.env.VITE_API_TOKEN,
+        },
+      })
     })
   }),
 });
-export const { useGetInvoicesQuery, useAddInvoiceMutation } = apiSlice;
+export const { useGetInvoicesQuery, useAddInvoiceMutation, useGetInvoiceQuery } = apiSlice;

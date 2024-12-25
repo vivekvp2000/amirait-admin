@@ -27,16 +27,23 @@ import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CirclePlus, Download, LoaderCircle } from "lucide-react";
-import { useState } from "react";
-import { useAddInvoiceMutation, useGetInvoicesQuery } from "@/store/slices/apiSlice";
+import { useEffect, useState } from "react";
+import { useAddInvoiceMutation, useGetInvoiceQuery, useGetInvoicesQuery } from "@/store/slices/apiSlice";
 import { toast } from "react-toastify";
+import { pdf } from "@react-pdf/renderer";
+import InvoicePdf from "@/services/pdfs/InvoicePdf";
 
 const Invoice = () => {
+  // All The States 
+  const [invoiceId, setInvoiceId] = useState(null);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [loadingInvoiceId, setLoadingInvoiceId] = useState(null);
+
+  // RTK apis 
   const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery()
   const [addInvoice, { isLoading, error }] = useAddInvoiceMutation();
-
-  const [showInvoice, setShowInvoice] = useState(false);
-
+  const { data: signleInvoice, isLoading: isSingleInvoiceLoading } = useGetInvoiceQuery(invoiceId);
+  console.log(signleInvoice)
   // For form data including items
   const [formData, setFormData] = useState({
     invoice_date: "",
@@ -110,6 +117,31 @@ const Invoice = () => {
       return !showInvoice
     })
   }
+  // Get Invoice  
+  const handleGetInvoice = async (id) => {
+    try {
+      setLoadingInvoiceId(id);
+      await setInvoiceId(id);
+    } catch (error) {
+      console.error("Error setting invoice ID:", error);
+    } finally {
+      setLoadingInvoiceId(null);
+    }
+  };
+
+  // Generate PDF when data is ready
+  useEffect(() => {
+    if (signleInvoice?.data) {
+      pdf(<InvoicePdf data={signleInvoice?.data} />)
+        .toBlob()
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          window.open(url, "_blank");
+        })
+        .catch((error) => console.error("Error generating PDF:", error));
+    }
+  }, [signleInvoice?.data]);
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -453,7 +485,17 @@ const Invoice = () => {
                       <TableCell className="text-center">{invoice?.customer_name}</TableCell>
                       <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
                       <TableCell className="text-center">{invoice?.sales_person}</TableCell>
-                      <TableCell className="text-center"><Button className="bg-green-700 dark:text-white"> <Download /></Button></TableCell>
+                      <TableCell className="text-center"><Button
+                        type="button"
+                        onClick={() => handleGetInvoice(invoice?.id)}
+                        className="bg-green-700 dark:text-white"
+                      >
+                        {loadingInvoiceId === invoice?.id ? (
+                          <LoaderCircle className="animate-spin" />
+                        ) : (
+                          <Download />
+                        )}
+                      </Button></TableCell>
                     </TableRow>
                   })
                 }
@@ -461,7 +503,7 @@ const Invoice = () => {
             </Table>
           </CardContent>
         </Card>
-      </div>
+      </div >
     </>
   );
 };
