@@ -37,13 +37,13 @@ const Invoice = () => {
   // All The States 
   const [invoiceId, setInvoiceId] = useState(null);
   const [showInvoice, setShowInvoice] = useState(false);
-  const [loadingInvoiceId, setLoadingInvoiceId] = useState(null);
+  const [loadingPdf, setLoadingPdf] = useState(false);
 
   // RTK apis 
-  const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery()
+  const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery();
   const [addInvoice, { isLoading, error }] = useAddInvoiceMutation();
   const { data: signleInvoice, isLoading: isSingleInvoiceLoading } = useGetInvoiceQuery(invoiceId);
-  console.log(signleInvoice)
+
   // For form data including items
   const [formData, setFormData] = useState({
     invoice_date: "",
@@ -72,12 +72,24 @@ const Invoice = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Calculate line total
+  const calculateLineTotal = (qty, unitPrice, discount) => {
+    const total = qty * unitPrice;
+    const discountedTotal = total - (total * (discount / 100));
+    return discountedTotal.toFixed(1);
+  };
+
   // Handle dynamic row change (for items)
   const handleRowChange = (e, index) => {
     const { name, value } = e.target;
-    const updatedItems = formData.items.map((item, i) =>
-      i === index ? { ...item, [name]: value } : item
-    );
+    const updatedItems = formData.items.map((item, i) => {
+      if (i === index) {
+        const updatedItem = { ...item, [name]: value };
+        updatedItem.lineTotal = calculateLineTotal(updatedItem.qty, updatedItem.unitPrice, updatedItem.discount);
+        return updatedItem;
+      }
+      return item;
+    });
     setFormData({ ...formData, items: updatedItems });
   };
 
@@ -113,32 +125,34 @@ const Invoice = () => {
   };
 
   const handleShowInvoice = () => {
-    setShowInvoice(() => {
-      return !showInvoice
-    })
-  }
+    setShowInvoice(!showInvoice);
+  };
+
   // Get Invoice  
   const handleGetInvoice = async (id) => {
     try {
-      setLoadingInvoiceId(id);
-      await setInvoiceId(id);
+      setInvoiceId(null); // Reset invoiceId to force re-fetch
+      setTimeout(() => setInvoiceId(id), 0); // Set the new invoiceId after a short delay
     } catch (error) {
       console.error("Error setting invoice ID:", error);
-    } finally {
-      setLoadingInvoiceId(null);
     }
   };
 
   // Generate PDF when data is ready
   useEffect(() => {
     if (signleInvoice?.data) {
+      setLoadingPdf(true);
       pdf(<InvoicePdf data={signleInvoice?.data} />)
         .toBlob()
         .then((blob) => {
           const url = URL.createObjectURL(blob);
           window.open(url, "_blank");
+          setLoadingPdf(false);
         })
-        .catch((error) => console.error("Error generating PDF:", error));
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+          setLoadingPdf(false);
+        });
     }
   }, [signleInvoice?.data]);
 
@@ -160,13 +174,12 @@ const Invoice = () => {
           <Button onClick={handleShowInvoice}>
             {showInvoice ? 'Cancel' : <><CirclePlus /> Add Invoice</>}
           </Button>
-
         </div>
       </div>
 
       <div>
-        {
-          showInvoice && <div>
+        {showInvoice && (
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -362,7 +375,7 @@ const Invoice = () => {
                           <TableRow key={index}>
                             <TableCell>
                               <Input
-                                type="text"
+                                type="number"
                                 placeholder="Qty"
                                 name="qty"
                                 value={row.qty}
@@ -402,8 +415,8 @@ const Invoice = () => {
                             </TableCell>
                             <TableCell>
                               <Input
-                                type="text"
-                                placeholder="Enter Discount"
+                                type="number"
+                                placeholder="Enter Discount %"
                                 name="discount"
                                 value={row.discount}
                                 onChange={(e) => handleRowChange(e, index)}
@@ -416,9 +429,8 @@ const Invoice = () => {
                                 placeholder="Enter Line Total"
                                 name="lineTotal"
                                 value={row.lineTotal}
-                                onChange={(e) => handleRowChange(e, index)}
-                                required
-                                readonly
+                                readOnly
+                                disabled
                               />
                             </TableCell>
                             <TableCell className="text-center">
@@ -446,17 +458,15 @@ const Invoice = () => {
               </CardContent>
             </Card>
           </div>
-        }
+        )}
       </div>
       <div>
-        {
-          isInvoiceLoading && <h4>Invoice List Loading....</h4>
-        }
+        {isInvoiceLoading && <h4>Invoice List Loading....</h4>}
         <Card>
           <CardHeader>
             <CardTitle>
               <h2 className="text-2xl font-semibold leading-none tracking-tight">
-                All  Invoice
+                All Invoice
               </h2>
             </CardTitle>
             <CardDescription>
@@ -478,32 +488,31 @@ const Invoice = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {
-                  allInvoice?.data?.map((invoice, index) => {
-                    return <TableRow key={index}>
-                      <TableCell className="text-center font-medium">{invoice?.customer_id ? invoice?.customer_id : '---'}</TableCell>
-                      <TableCell className="text-center">{invoice?.customer_name}</TableCell>
-                      <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
-                      <TableCell className="text-center">{invoice?.sales_person}</TableCell>
-                      <TableCell className="text-center"><Button
+                {allInvoice?.data?.map((invoice, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-center font-medium">{invoice?.customer_id ? invoice?.customer_id : '---'}</TableCell>
+                    <TableCell className="text-center">{invoice?.customer_name}</TableCell>
+                    <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
+                    <TableCell className="text-center">{invoice?.sales_person}</TableCell>
+                    <TableCell className="text-center">
+                      <Button
                         type="button"
                         onClick={() => handleGetInvoice(invoice?.id)}
                         className="bg-green-700 dark:text-white"
                       >
-                        {loadingInvoiceId === invoice?.id ? (
-                          <LoaderCircle className="animate-spin" />
-                        ) : (
-                          <Download />
-                        )}
-                      </Button></TableCell>
-                    </TableRow>
-                  })
-                }
+                        <Download />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
-      </div >
+      </div>
+      {loadingPdf && <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+        <LoaderCircle className="animate-spin" size={50} />
+      </div>}
     </>
   );
 };
