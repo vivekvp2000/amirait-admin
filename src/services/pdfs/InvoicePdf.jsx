@@ -1,190 +1,220 @@
-import { Fragment } from 'react'
-import { Image, Text, View, Page, Document, StyleSheet } from '@react-pdf/renderer';
+import { Fragment } from 'react';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import logo from "@assets/images/logo.png";
+import rupeIcon from "@assets/icons/rupee.png";
+import rupeIconWhite from "@assets/icons/rupeewhite.png";
 
+import bgLogo from "@assets/images/bg-logo.png";
+
+
+// Define styles
+const styles = StyleSheet.create({
+    page: {
+        padding: 40,
+        fontSize: 10,
+        lineHeight: 1.7,
+        position: 'relative',
+    },
+    backgroundImage: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.2,
+        objectFit: 'contain',
+    },
+    header: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 25,
+    },
+    headerText: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#002060",
+    },
+    subHeaderText: {
+        fontSize: 10,
+        marginBottom: 5,
+    },
+    section: {
+        marginBottom: 20,
+    },
+    table: {
+        display: "table",
+        width: "100%",
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderColor: "#E0E0E0",
+    },
+    tableRow: {
+        flexDirection: "row",
+    },
+    tableHeader: {
+        backgroundColor: "#D9E9FF",
+        borderBottomColor: "#B0C4DE",
+        borderBottomWidth: 1,
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    tableHeaderCell: {
+        flex: 1,
+        padding: 5,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    tableCell: {
+        flex: 1,
+        padding: 5,
+        textAlign: "center",
+        borderRightWidth: 1,
+        borderRightColor: "#E0E0E0",
+        borderBottomWidth: 1,
+        borderBottomColor: "#E0E0E0",
+    },
+    totalRow: {
+        flexDirection: "row",
+        backgroundColor: "#D9E9FF",
+        borderTopWidth: 1,
+        borderTopColor: "#B0C4DE",
+    },
+    totalCell: {
+        flex: 1,
+        padding: 5,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 0, // Places the footer at the bottom of the page
+        left: 0, // Aligns to the left edge
+        right: 0, // Aligns to the right edge
+        borderTopWidth: 1,
+        borderTopColor: "#E0E0E0",
+        paddingTop: 10,
+        textAlign: "center", // Centers the text horizontally
+    },
+});
+
+// Invoice component
 const InvoicePdf = ({ data }) => {
-
-    const reciept_data = {
-        "id": "642be0b4bbe5d71a5341dfb1",
-        "invoice_no": "20200669",
-        "address": "739 Porter Avenue, Cade, Missouri, 1134",
-        "date": "24-09-2019",
-        "items": [
-            {
-                "id": 1,
-                "desc": "do ex anim quis velit excepteur non",
-                "qty": 8,
-                "price": 179.25
-            },
-            {
-                "id": 2,
-                "desc": "incididunt cillum fugiat aliqua Lorem sit Lorem",
-                "qty": 9,
-                "price": 107.78
-            },
-            {
-                "id": 3,
-                "desc": "quis Lorem ad laboris proident aliqua laborum",
-                "qty": 4,
-                "price": 181.62
-            },
-            {
-                "id": 4,
-                "desc": "exercitation non do eu ea ullamco cillum",
-                "qty": 4,
-                "price": 604.55
-            },
-            {
-                "id": 5,
-                "desc": "ea nisi non excepteur irure Lorem voluptate",
-                "qty": 6,
-                "price": 687.08
-            }
-        ]
-    }
-
-    const styles = StyleSheet.create({
-        page: { fontSize: 11, paddingTop: 20, paddingLeft: 40, paddingRight: 40, lineHeight: 1.5, flexDirection: 'column' },
-
-        spaceBetween: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', color: "#3E3E3E" },
-
-        titleContainer: { flexDirection: 'row', marginTop: 24 },
-
-        logo: { width: 90 },
-
-        reportTitle: { fontSize: 16, textAlign: 'center' },
-
-        addressTitle: { fontSize: 11, fontStyle: 'bold' },
-
-        invoice: { fontWeight: 'bold', fontSize: 20 },
-
-        invoiceNumber: { fontSize: 11, fontWeight: 'bold', marginTop: 2 },
-
-        address: { fontWeight: 400, fontSize: 10 },
-
-        theader: { marginTop: 20, fontSize: 10, fontStyle: 'bold', paddingTop: 4, paddingLeft: 7, flex: 1, height: 20, backgroundColor: '#DEDEDE', color: '#000000', borderColor: 'whitesmoke', borderRightWidth: 1, borderBottomWidth: 1 },
-
-        theader2: { flex: 2, borderRightWidth: 0, borderBottomWidth: 1 },
-
-        tbody: { fontSize: 9, paddingTop: 4, paddingLeft: 7, flex: 1, borderColor: 'whitesmoke', borderRightWidth: 1, borderBottomWidth: 1 },
-
-        total: { fontSize: 9, paddingTop: 4, paddingLeft: 7, flex: 1.5, borderColor: 'whitesmoke', borderBottomWidth: 1 },
-
-        tbody2: { flex: 2, borderRightWidth: 1, }
-
-    });
-
-    const InvoiceTitle = () => (
-        <View style={styles.titleContainer}>
-            <View style={styles.spaceBetween}>
-                <Image style={styles.logo} src={logo} />
-                <Text style={styles.reportTitle}>Amirait</Text>
-            </View>
-        </View>
-    );
-
-    const Address = () => (
-        <View style={styles.titleContainer}>
-            <View style={styles.spaceBetween}>
-                <View>
-                    <Text style={styles.invoice}>Invoice </Text>
-                    <Text style={styles.invoiceNumber}>Invoice number: {reciept_data.invoice_no} </Text>
-                </View>
-                <View>
-                    <Text style={styles.addressTitle}>7, Ademola Odede, </Text>
-                    <Text style={styles.addressTitle}>Ikeja,</Text>
-                    <Text style={styles.addressTitle}>Lagos, Nigeria.</Text>
-                </View>
-            </View>
-        </View>
-    );
-
-    const UserAddress = () => (
-        <View style={styles.titleContainer}>
-            <View style={styles.spaceBetween}>
-                <View style={{ maxWidth: 200 }}>
-                    <Text style={styles.addressTitle}>Bill to </Text>
-                    <Text style={styles.address}>
-                        {reciept_data.address}
-                    </Text>
-                </View>
-                <Text style={styles.addressTitle}>{reciept_data.date}</Text>
-            </View>
-        </View>
-    );
-
-
-    const TableHead = () => (
-        <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
-            <View style={[styles.theader, styles.theader2]}>
-                <Text >Items</Text>
-            </View>
-            <View style={styles.theader}>
-                <Text>Price</Text>
-            </View>
-            <View style={styles.theader}>
-                <Text>Qty</Text>
-            </View>
-            <View style={styles.theader}>
-                <Text>Amount</Text>
-            </View>
-        </View>
-    );
-
-
-    const TableBody = () => (
-        reciept_data.items.map((receipt) => (
-            <Fragment key={receipt.id}>
-                <View style={{ width: '100%', flexDirection: 'row' }}>
-                    <View style={[styles.tbody, styles.tbody2]}>
-                        <Text >{receipt.desc}</Text>
-                    </View>
-                    <View style={styles.tbody}>
-                        <Text>{receipt.price} </Text>
-                    </View>
-                    <View style={styles.tbody}>
-                        <Text>{receipt.qty}</Text>
-                    </View>
-                    <View style={styles.tbody}>
-                        <Text>{(receipt.price * receipt.qty).toFixed(2)}</Text>
-                    </View>
-                </View>
-            </Fragment>
-        ))
-    );
-
-    const TableTotal = () => (
-        <View style={{ width: '100%', flexDirection: 'row' }}>
-            <View style={styles.total}>
-                <Text></Text>
-            </View>
-            <View style={styles.total}>
-                <Text> </Text>
-            </View>
-            <View style={styles.tbody}>
-                <Text>Total</Text>
-            </View>
-            <View style={styles.tbody}>
-                <Text>
-                    {reciept_data.items.reduce((sum, item) => sum + (item.price * item.qty), 0)}
-                </Text>
-            </View>
-        </View>
-    );
+    const { invoice_no, items, invoice_date, customer_address, customer_phone, payment_due_date, customer_name, customer_id, delivery_date, payment_date, payment_method, sales_person, paid_amount, due_amount, grand_total } = data || {};
 
     return (
-        <Document>
+        <Document style={{ fontFamily: 'Helvetica' }}>
             <Page size="A4" style={styles.page}>
-                <InvoiceTitle />
-                <Address />
-                <UserAddress />
-                <TableHead />
-                <TableBody />
-                <TableTotal />
+                <Image
+                    src={bgLogo}
+                    style={styles.backgroundImage}
+                />
+
+                <View style={styles.header}>
+                    <View>
+                        <Text style={{ marginLeft: -10, marginTop: -10 }}>
+                            <Image src={logo} alt="logo" style={{ width: 130, height: 30, display: "block" }} />
+                            {/* <Text style={styles.subHeaderText}>{invoice_date || 'invoice_no'}</Text> */}
+                        </Text>
+                    </View>
+                    <View style={{ marginTop: 20 }}>
+                        <Text style={styles.headerText}>INVOICE:</Text>
+                        <Text style={styles.subHeaderText}>  {invoice_no || ''}</Text>
+                    </View>
+                </View>
+
+                {/* Bill To and Bill From */}
+                <View style={[styles.section, { flexDirection: "row", justifyContent: "space-between" }]}>
+                    <View>
+                        <Text style={[styles.headerText, { marginBottom: 8 }]}>Bill To</Text>
+                        <Text>Customer: {customer_name || '--'}</Text>
+                        <Text>Customer ID: {customer_id || '--'}</Text>
+                        <Text>Address: {customer_address || '--'}</Text>
+                        <Text>Phone: {customer_phone || '--'}</Text>
+                    </View>
+                    <View>
+                        <Text style={[styles.headerText, { marginBottom: 8 }]}>Bill From</Text>
+                        <Text>Recipient: Amirait™ Dev Rise Global Technologies Pvt Ltd</Text>
+                        <Text>Address: Phase 1, Saharanpur Rd, Shakti Vihar, Majra, Dehradun</Text>
+                        <Text>Phone: +91 7017986097</Text>
+                    </View>
+                </View>
+
+                {/* Payment Details */}
+                <View style={[styles.section, { flexDirection: "row", justifyContent: "space-between" }]}>
+                    <View>
+                        <Text>Payment Due: {payment_due_date || '--'}</Text>
+                        <Text>Salesperson:{sales_person || '--'}</Text>
+                    </View>
+                    <View>
+                        <Text>Delivery Date: {delivery_date || '--'}</Text>
+                        <Text>Payment Method: {payment_method || '--'}</Text>
+                    </View>
+                </View>
+
+                {/* Table */}
+                <View style={styles.table}>
+                    {/* Table Header */}
+                    <View style={styles.tableHeader}>
+                        <Text style={styles.tableHeaderCell}>Qty.</Text>
+                        <Text style={styles.tableHeaderCell}>Item#</Text>
+                        <Text style={styles.tableHeaderCell}>Description</Text>
+                        <Text style={styles.tableHeaderCell}>Unit Price</Text>
+                        <Text style={styles.tableHeaderCell}>Discount</Text>
+                        <Text style={styles.tableHeaderCell}>Sub Total</Text>
+                    </View>
+
+                    {/* Table Rows */}
+                    {items.map((item, index) => (
+                        <Fragment key={index}>
+                            <View style={styles.tableRow}>
+                                <Text style={styles.tableCell}>{item.qty || '--'}</Text>
+                                <Text style={styles.tableCell}>{item.item || '--'}</Text>
+                                <Text style={styles.tableCell}>{item.description || '--'}</Text>
+                                <Text style={styles.tableCell}> <Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.price || '--'}</Text>
+                                <Text style={styles.tableCell}>{item.discount || '--'}%</Text>
+                                <Text style={styles.tableCell}><Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.total || '--'}</Text>
+                            </View>
+                        </Fragment>
+                    ))}
+
+                    <View style={styles.totalRow}>
+                        <Text style={[styles.totalCell, { flex: 4 }]}>Total Discount</Text>
+                        <Text style={[styles.totalCell, { flex: 2 }]}><Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>000000</Text>
+                    </View>
+                    <View style={styles.totalRow}>
+                        <Text style={[styles.totalCell, { flex: 4 }]}><Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>Subtotal</Text>
+                        <Text style={[styles.totalCell, { flex: 2 }]}><Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{grand_total || '--'}</Text>
+                    </View>
+                    <View style={[styles.totalRow, { backgroundColor: "#3E90F0" }]}>
+                        <Text style={[styles.totalCell, { flex: 4, color: "#FFF" }]}>Total</Text>
+                        <Text style={[styles.totalCell, { flex: 2, color: "#FFF" }]}><Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{grand_total || '--'}</Text>
+                    </View>
+                    <View style={[styles.totalRow, { backgroundColor: "#3E90F0" }]}>
+                        <Text style={[styles.totalCell, { flex: 4 }]}>Total Paid</Text>
+                        <Text style={[styles.totalCell, { flex: 2,color: "#FFF"  }]}><Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{paid_amount || '--'}</Text>
+                    </View>
+                    <View style={[styles.totalRow, { backgroundColor: "#3E90F0" }]}>
+                        <Text style={[styles.totalCell, { flex: 4 }]}>Amount Due</Text>
+                        <Text style={[styles.totalCell, { flex: 2 ,color: "#FFF" }]}><Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{due_amount || '--'}</Text>
+                    </View>
+
+                </View>
+
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                    <Text>Thank you for your business!</Text>
+                    <Text>
+                        Amirait™ Dev Rise Global Technologies Pvt Ltd
+                        {"\n"}Phase-1, Saharanpur Rd, Shakti Vihar, Majra, Dehradun
+                        {"\n"}P.No. +91 7017986097 | info@amirait.com
+                    </Text>
+                </View>
             </Page>
-        </Document>
+        </Document >
+    );
+};
 
-    )
-}
-
-export default InvoicePdf
+export default InvoicePdf;

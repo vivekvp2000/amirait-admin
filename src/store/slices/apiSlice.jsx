@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({ baseUrl: `${import.meta.env.VITE_BASE_URL}` }),
+  tagTypes: ['invoice'],
   endpoints: (builder) => ({
     addInvoice: builder.mutation({
       query: (formData) => ({
@@ -13,6 +14,7 @@ export const apiSlice = createApi({
           Authorization: import.meta.env.VITE_API_TOKEN,
         },
       }),
+      invalidatesTags: ['invoice']
     }),
     getInvoices: builder.query({
       query: () => ({
@@ -21,7 +23,8 @@ export const apiSlice = createApi({
         headers: {
           Authorization: import.meta.env.VITE_API_TOKEN,
         },
-      })
+      }),
+      providesTags: ['invoice']
     }),
     getInvoice: builder.query({
       query: (id) => ({

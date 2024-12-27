@@ -42,8 +42,9 @@ const Invoice = () => {
   // RTK apis 
   const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery();
   const [addInvoice, { isLoading, error }] = useAddInvoiceMutation();
-  const { data: signleInvoice, isLoading: isSingleInvoiceLoading } = useGetInvoiceQuery(invoiceId);
+  const { data: signleInvoice } = useGetInvoiceQuery(invoiceId);
 
+  console.log(allInvoice)
   // For form data including items
   const [formData, setFormData] = useState({
     invoice_date: "",
@@ -54,6 +55,7 @@ const Invoice = () => {
     sales_person: "",
     delivery_date: "",
     payment_method: "",
+    paid_amount: "",
     items: [
       {
         qty: "",
@@ -115,9 +117,9 @@ const Invoice = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await addInvoice(formData).unwrap();
-      console.log("Response:", response);
+      await addInvoice(formData).unwrap();
       toast.success("Invoice added successfully!");
+
     } catch (error) {
       console.log("Error:", error.data.errors);
       toast.error(error.data.message);
@@ -131,8 +133,8 @@ const Invoice = () => {
   // Get Invoice  
   const handleGetInvoice = async (id) => {
     try {
-      setInvoiceId(null); // Reset invoiceId to force re-fetch
-      setTimeout(() => setInvoiceId(id), 0); // Set the new invoiceId after a short delay
+      setInvoiceId(null);
+      setTimeout(() => setInvoiceId(id), 0);
     } catch (error) {
       console.error("Error setting invoice ID:", error);
     }
@@ -145,8 +147,18 @@ const Invoice = () => {
       pdf(<InvoicePdf data={signleInvoice?.data} />)
         .toBlob()
         .then((blob) => {
-          const url = URL.createObjectURL(blob);
-          window.open(url, "_blank");
+          const customerName = signleInvoice?.data?.customer_name || "Invoice";
+          const filename = `${customerName.replace(/\s+/g, '_')}_Invoice.pdf`;
+          const file = new File([blob], filename, { type: "application/pdf" });
+
+          const url = URL.createObjectURL(file);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = file.name;
+          a.click();
+
+          // Clean up
+          URL.revokeObjectURL(url);
           setLoadingPdf(false);
         })
         .catch((error) => {
@@ -341,6 +353,24 @@ const Invoice = () => {
                       />
                       {error?.data?.errors?.payment_method && <span className="text-red-500 text-sm">{error?.data?.errors?.payment_method?.join('')}</span>}
                     </div>
+                    <div>
+                      <label
+                        htmlFor="paid-amount"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Paid Amount
+                      </label>
+                      <Input
+                        type="number"
+                        id="paid-amount"
+                        placeholder="Enter Paid Amount"
+                        name="paid_amount"
+                        value={formData.paid_amount}
+                        onChange={handleChange}
+                        className={`${error?.data?.errors?.paid_amount && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.paid_amount && <span className="text-red-500 text-sm">{error?.data?.errors?.paid_amount?.join('')}</span>}
+                    </div>
                   </div>
 
                   <div className="mt-4">
@@ -461,7 +491,7 @@ const Invoice = () => {
         )}
       </div>
       <div>
-        {isInvoiceLoading && <h4>Invoice List Loading....</h4>}
+
         <Card>
           <CardHeader>
             <CardTitle>
@@ -476,6 +506,7 @@ const Invoice = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {isInvoiceLoading && <h4>Invoice List Loading....</h4>}
             <Table className='w-full border light:border-gray-200'>
               <TableCaption>A list of your recent invoices.</TableCaption>
               <TableHeader>

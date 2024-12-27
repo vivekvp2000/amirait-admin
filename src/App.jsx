@@ -1,10 +1,15 @@
 import { Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from "react";
+
 import { HomePage } from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardLayout from "./layout/DashboardLayout";
-import Invoice from "./pages/Invoice";
 import NotFound from "./pages/NotFound";
+import PageLoader from "./components/PageLoader";
+
+// Lazy Loading Components
+const Invoice = lazy(() => import("./pages/Invoice"));
 
 function App() {
   return (
@@ -12,7 +17,7 @@ function App() {
       {/* DashboardLayout route with nested routes */}
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="invoice" element={<Invoice />} />
+        <Route path="invoice" element={<Suspense fallback={<div><PageLoader /></div>}><Invoice /></Suspense>} />
       </Route>
       {/* Login and Register routes */}
       <Route path="/login" element={<LoginPage />} />
