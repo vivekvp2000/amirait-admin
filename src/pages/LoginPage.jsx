@@ -9,12 +9,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
-export const description =
-  "A simple login form with email and password. The submit button says 'Sign in'.";
+
+
 
 export default function LoginPage() {
+  const [formData, setFormData] = useState({
+    email: '',
+    
+  })
+  
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-sm">
@@ -36,7 +42,7 @@ export default function LoginPage() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required />
+            <Input id="password" type="password" required placeholder="Enter Your Password" />
           </div>
         </CardContent>
         <CardFooter className="flex-col">
@@ -45,7 +51,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-4 text-center text-sm flex gap-2">
-            Don't have an account? 
+            Don't have an account?
             <Link to="/register" className="text-primary font-bold">
               Sign in
             </Link>

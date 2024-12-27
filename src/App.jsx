@@ -10,6 +10,8 @@ import PageLoader from "./components/PageLoader";
 
 // Lazy Loading Components
 const Invoice = lazy(() => import("./pages/Invoice"));
+const Proposal = lazy(() => import("./pages/Proposal"));
+
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<HomePage />} />
         <Route path="invoice" element={<Suspense fallback={<div><PageLoader /></div>}><Invoice /></Suspense>} />
+        <Route path="proposal" element={<Suspense fallback={<div><PageLoader /></div>}><Proposal /></Suspense>} />
+
       </Route>
       {/* Login and Register routes */}
       <Route path="/login" element={<LoginPage />} />

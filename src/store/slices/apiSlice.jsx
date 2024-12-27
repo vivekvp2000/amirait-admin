@@ -23,6 +23,7 @@ export const apiSlice = createApi({
         headers: {
           Authorization: import.meta.env.VITE_API_TOKEN,
         },
+        params: {}
       }),
       providesTags: ['invoice']
     }),

@@ -73,6 +73,17 @@ const DashboardLayout = () => {
                   <File className="h-4 w-4" />
                   Invoice
                 </NavLink>
+                <NavLink
+                  to="/proposal"
+                  className={({ isActive }) =>
+                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                      isActive ? "text-theme" : ""
+                    }`
+                  }
+                >
+                  <File className="h-4 w-4" />
+                  Proposal
+                </NavLink>
               </nav>
             </div>
           </div>

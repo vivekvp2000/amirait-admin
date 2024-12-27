@@ -109,7 +109,6 @@ const InvoicePdf = ({ data = {} }) => {
                     src={bgLogo}
                     style={styles.backgroundImage}
                 />
-
                 <View style={styles.header}>
                     <View>
                         <Text style={{ marginLeft: -10, marginTop: -10 }}>

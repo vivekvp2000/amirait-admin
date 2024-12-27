@@ -1,7 +1,17 @@
+// import {
+//   Pagination,
+//   PaginationContent,
+//   PaginationEllipsis,
+//   PaginationItem,
+//   PaginationLink,
+//   PaginationNext,
+//   PaginationPrevious,
+// } from "@/components/ui/pagination"
+
+
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -38,6 +48,8 @@ const Invoice = () => {
   const [invoiceId, setInvoiceId] = useState(null);
   const [showInvoice, setShowInvoice] = useState(false);
   const [loadingPdf, setLoadingPdf] = useState(false);
+  const [filteredInvoice, setFilteredInvoice] = useState([]);
+  const [inputSearchInvoice, setInputSearchInvoice] = useState('')
 
   // RTK apis 
   const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery();
@@ -66,6 +78,11 @@ const Invoice = () => {
       },
     ],
   });
+  useEffect(() => {
+    if (allInvoice?.data) {
+      setFilteredInvoice(allInvoice.data);
+    }
+  }, [allInvoice]);
 
   // Handle form data change
   const handleChange = (e) => {
@@ -165,6 +182,15 @@ const Invoice = () => {
         });
     }
   }, [signleInvoice?.data]);
+
+  // Filter Invoice 
+  const handleFiterInvoice = () => {
+    if (!allInvoice?.data) return;
+    const filterInvoice = allInvoice.data.filter((invoice) => {
+      return invoice.customer_name.toLowerCase().includes(inputSearchInvoice.toLowerCase())
+    });
+    setFilteredInvoice(filterInvoice);
+  };
 
   return (
     <>
@@ -369,6 +395,25 @@ const Invoice = () => {
                       />
                       {error?.data?.errors?.paid_amount && <span className="text-red-500 text-sm">{error?.data?.errors?.paid_amount?.join('')}</span>}
                     </div>
+                    <div>
+                      <label
+                        htmlFor="paid-amount"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Tax
+                      </label>
+                      <Input
+                        type="number"
+                        id="paid-amount"
+                        placeholder="Enter Tax"
+                        name="paid_amount"
+                        // value={formData.paid_amount}
+                        // onChange={handleChange}
+                        className={`${error?.data?.errors?.paid_amount && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.paid_amount && <span className="text-red-500 text-sm">{error?.data?.errors?.paid_amount?.join('')}</span>}
+                    </div>
+
                   </div>
 
                   <div className="mt-4">
@@ -491,22 +536,29 @@ const Invoice = () => {
       <div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>
-              <h2 className="text-2xl font-semibold leading-none tracking-tight">
-                All Invoice
-              </h2>
-            </CardTitle>
-            <CardDescription>
-              <p className="text-sm text-muted-foreground">
-                All Invoice List
-              </p>
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>
+                <h2 className="text-2xl font-semibold leading-none tracking-tight">
+                  All Invoice
+                </h2>
+              </CardTitle>
+              <CardDescription>
+                <p className="text-sm text-muted-foreground mt-1">
+                  All Invoice List
+                </p>
+              </CardDescription>
+            </div>
+            <div className="flex itemsc-center gap-2">
+              <Input type="text" placeholder="Search Invoice" onChange={(e) => setInputSearchInvoice(e.target.value)} />
+              <Button onClick={handleFiterInvoice}>Search</Button>
+            </div>
+
+
           </CardHeader>
           <CardContent>
             {isInvoiceLoading && <h4>Invoice List Loading....</h4>}
             <Table className='w-full border light:border-gray-200'>
-              <TableCaption>A list of your recent invoices.</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-center font-bold text-black dark:text-white">Customer Id</TableHead>
@@ -518,7 +570,7 @@ const Invoice = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {allInvoice?.data?.map((invoice, index) => (
+                {filteredInvoice.map((invoice, index) => (
                   <TableRow key={index}>
                     <TableCell className="text-center font-medium">{invoice?.custome_invoice_id ? invoice?.custome_invoice_id : '---'}</TableCell>
                     <TableCell className="text-center">{invoice?.customer_name}</TableCell>
@@ -533,12 +585,29 @@ const Invoice = () => {
                         className="bg-green-700 dark:text-white"
                       >
                         <Download />
+
                       </Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            {/* <Pagination className='mt-4'>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious href="#" />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext href="#" className='bg-green-500 text-white' />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination> */}
           </CardContent>
         </Card>
       </div>
