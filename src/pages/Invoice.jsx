@@ -44,7 +44,6 @@ const Invoice = () => {
   const [addInvoice, { isLoading, error }] = useAddInvoiceMutation();
   const { data: signleInvoice } = useGetInvoiceQuery(invoiceId);
 
-  console.log(allInvoice)
   // For form data including items
   const [formData, setFormData] = useState({
     invoice_date: "",
@@ -139,7 +138,6 @@ const Invoice = () => {
       console.error("Error setting invoice ID:", error);
     }
   };
-
   // Generate PDF when data is ready
   useEffect(() => {
     if (signleInvoice?.data) {
@@ -514,6 +512,7 @@ const Invoice = () => {
                   <TableHead className="text-center font-bold text-black dark:text-white">Customer Id</TableHead>
                   <TableHead className="text-center font-bold text-black dark:text-white">Customer Name</TableHead>
                   <TableHead className="text-center font-bold text-black dark:text-white">Delivery Date</TableHead>
+                  <TableHead className="text-center font-bold text-black dark:text-white">Total Amount</TableHead>
                   <TableHead className="text-center font-bold text-black dark:text-white">Sales Person</TableHead>
                   <TableHead className="text-center font-bold text-black dark:text-white">Export</TableHead>
                 </TableRow>
@@ -521,9 +520,11 @@ const Invoice = () => {
               <TableBody>
                 {allInvoice?.data?.map((invoice, index) => (
                   <TableRow key={index}>
-                    <TableCell className="text-center font-medium">{invoice?.customer_id ? invoice?.customer_id : '---'}</TableCell>
+                    <TableCell className="text-center font-medium">{invoice?.custome_invoice_id ? invoice?.custome_invoice_id : '---'}</TableCell>
                     <TableCell className="text-center">{invoice?.customer_name}</TableCell>
                     <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
+                    <TableCell className="text-center">{invoice?.grand_total}</TableCell>
+
                     <TableCell className="text-center">{invoice?.sales_person}</TableCell>
                     <TableCell className="text-center">
                       <Button

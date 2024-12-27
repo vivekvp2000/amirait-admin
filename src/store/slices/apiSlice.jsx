@@ -32,7 +32,7 @@ export const apiSlice = createApi({
         method: "GET",
         headers: {
           Authorization: import.meta.env.VITE_API_TOKEN,
-        },
+        }
       })
     })
   }),
