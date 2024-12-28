@@ -63,5 +63,6 @@ export const {
   useAddInvoiceMutation,
   useGetInvoiceQuery,
   useAddProposalMutation,
-  useGetProposalsQuery
+  useGetProposalsQuery,
+  usePrefetch
 } = apiSlice;

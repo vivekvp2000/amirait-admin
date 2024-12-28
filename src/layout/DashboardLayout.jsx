@@ -27,7 +27,6 @@ import logo from "@assets/images/logo.png";
 
 const DashboardLayout = () => {
   const { theme, setTheme } = useTheme();
-
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
@@ -41,7 +40,7 @@ const DashboardLayout = () => {
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
               <a href="/" className="flex items-center gap-2 font-semibold">
                 <span className="">
-                  <img src={logo} alt="logo" className="max-w-36" />
+                  <img src={logo} alt="logo" className={`${theme === 'dark' ? 'invert-[1]' : ''} max-w-36 `} />
                 </span>
               </a>
               <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
@@ -54,8 +53,7 @@ const DashboardLayout = () => {
                 <NavLink
                   to="/"
                   className={({ isActive }) =>
-                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
-                      isActive ? "text-theme" : ""
+                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${isActive ? "text-theme" : ""
                     }`
                   }
                 >
@@ -65,8 +63,7 @@ const DashboardLayout = () => {
                 <NavLink
                   to="/invoice"
                   className={({ isActive }) =>
-                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
-                      isActive ? "text-theme" : ""
+                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${isActive ? "text-theme" : ""
                     }`
                   }
                 >
@@ -76,8 +73,7 @@ const DashboardLayout = () => {
                 <NavLink
                   to="/proposal"
                   className={({ isActive }) =>
-                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
-                      isActive ? "text-theme" : ""
+                    `flex items-center font-semibold text-black gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${isActive ? "text-theme" : ""
                     }`
                   }
                 >
