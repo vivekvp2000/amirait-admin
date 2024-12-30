@@ -553,20 +553,18 @@ const Invoice = () => {
               <Input type="text" placeholder="Search Invoice" onChange={(e) => setInputSearchInvoice(e.target.value)} />
               <Button onClick={handleFiterInvoice}>Search</Button>
             </div>
-
-
           </CardHeader>
           <CardContent>
             {isInvoiceLoading && <h4>Invoice List Loading....</h4>}
             <Table className='w-full border light:border-gray-200'>
-              <TableHeader>
+              <TableHeader className="bg-black ">
                 <TableRow>
-                  <TableHead className="text-center font-bold text-black dark:text-white">Customer Id</TableHead>
-                  <TableHead className="text-center font-bold text-black dark:text-white">Customer Name</TableHead>
-                  <TableHead className="text-center font-bold text-black dark:text-white">Delivery Date</TableHead>
-                  <TableHead className="text-center font-bold text-black dark:text-white">Total Amount</TableHead>
-                  <TableHead className="text-center font-bold text-black dark:text-white">Sales Person</TableHead>
-                  <TableHead className="text-center font-bold text-black dark:text-white">Export</TableHead>
+                  <TableHead className="text-center font-bold text-white">Customer Id</TableHead>
+                  <TableHead className="text-center font-bold text-white">Customer Name</TableHead>
+                  <TableHead className="text-center font-bold text-white">Delivery Date</TableHead>
+                  <TableHead className="text-center font-bold text-white">Total Amount</TableHead>
+                  <TableHead className="text-center font-bold text-white">Sales Person</TableHead>
+                  <TableHead className="text-center font-bold text-white">Export</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

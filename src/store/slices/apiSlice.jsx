@@ -3,7 +3,6 @@ const authHeaders = {
     Authorization: import.meta.env.VITE_API_TOKEN,
   },
 };
-
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const apiSlice = createApi({
@@ -45,7 +44,7 @@ export const apiSlice = createApi({
         body: formData,
         ...authHeaders,
       }),
-      invalidatesTags: ['proposal'], // Invalidates 'proposal' cache
+      invalidatesTags: ['proposal'],
     }),
     getProposals: builder.query({
       query: () => ({
@@ -53,8 +52,15 @@ export const apiSlice = createApi({
         method: "GET",
         ...authHeaders,
       }),
-      providesTags: ['proposal'], // Provides 'proposal' cache
+      providesTags: ['proposal'],
     }),
+    getProposal: builder.query({
+      query: (id) => ({
+        url: `get/porposal/${id}`,
+        method: 'GET',
+        ...authHeaders,
+      })
+    })
   }),
 });
 
@@ -64,5 +70,5 @@ export const {
   useGetInvoiceQuery,
   useAddProposalMutation,
   useGetProposalsQuery,
-  usePrefetch
+  useGetProposalQuery
 } = apiSlice;
