@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 
 // Invoice component
 const InvoicePdf = ({ data = {} }) => {
-    const { invoice_no, items, customer_address, customer_phone, payment_due_date, customer_name, custome_invoice_id, delivery_date, sub_total, tax, payment_method, sales_person, paid_amount, due_amount, grand_total } = data || {};
+    const { invoice_no, items, customer_address, customer_phone, payment_due_date, customer_name, custome_invoice_id, delivery_date, sub_total, tax, payment_method, name, quantity, sales_person, paid_amount, due_amount, grand_total } = data || {};
 
     return (
         <Document style={{ fontFamily: 'Helvetica' }}>
@@ -124,14 +124,14 @@ const InvoicePdf = ({ data = {} }) => {
 
                 {/* Bill To and Bill From */}
                 <View style={[styles.section, { flexDirection: "row", justifyContent: "space-between" }]}>
-                    <View style={{ width: '60%' }}>
+                    <View style={{ width: '55%' }}>
                         <Text style={[styles.headerText, { marginBottom: 8 }]}>Bill To</Text>
                         <Text>Customer: {customer_name || '--'}</Text>
                         <Text>Customer ID: {custome_invoice_id || '--'}</Text>
                         <Text>Address: {customer_address || '--'}</Text>
                         <Text>Phone: {customer_phone || '--'}</Text>
                     </View>
-                    <View style={{ width: '40%' }}>
+                    <View style={{ width: '45%' }}>
                         <Text style={[styles.headerText, { marginBottom: 8 }]}>Bill From</Text>
                         <Text>Recipient: Amirait™ Dev Rise Global Technologies Pvt Ltd</Text>
                         <Text>Address: Phase 1, Saharanpur Rd, Shakti Vihar, Majra, Dehradun</Text>
@@ -167,11 +167,11 @@ const InvoicePdf = ({ data = {} }) => {
                     {items.map((item, index) => (
                         <Fragment key={index}>
                             <View style={styles.tableRow}>
-                                <Text style={styles.tableCell}>{item.qty || '--'}</Text>
-                                <Text style={styles.tableCell}>{item.item || '--'}</Text>
+                                <Text style={styles.tableCell}>{item.quantity || '--'}</Text>
+                                <Text style={styles.tableCell}>{item.name || '--'}</Text>
                                 <Text style={styles.tableCell}>{item.description || '--'}</Text>
                                 <Text style={styles.tableCell}> <Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.price || '--'}</Text>
-                                <Text style={styles.tableCell}>{item.discount ? item.discount + '%' : '--'}</Text>
+                                <Text style={styles.tableCell}>{item.discount + '%'}</Text>
                                 <Text style={styles.tableCell}><Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.total || '--'}</Text>
                             </View>
                         </Fragment>
@@ -197,7 +197,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", color: "#FFF", paddingHorizontal: 0
-                        }]}> <Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{tax || '--'}</Text>
+                        }]}> <Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{tax}</Text>
                     </View>
                     <View style={{ display: 'flex', paddingHorizontal: 0, flexDirection: 'row', }}>
                         <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>

@@ -67,6 +67,8 @@ const Invoice = () => {
     delivery_date: "",
     payment_method: "",
     paid_amount: "",
+    tax_percent: "",
+    discount_percent: '',
     items: [
       {
         qty: "",
@@ -93,8 +95,9 @@ const Invoice = () => {
   // Calculate line total
   const calculateLineTotal = (qty, unitPrice, discount) => {
     const total = qty * unitPrice;
-    const discountedTotal = total - (total * (discount / 100));
-    return discountedTotal.toFixed(1);
+    // const discountedTotal = total - (total * (discount / 100));
+    // return discountedTotal.toFixed(1);
+    return total;
   };
 
   // Handle dynamic row change (for items)
@@ -397,21 +400,39 @@ const Invoice = () => {
                     </div>
                     <div>
                       <label
-                        htmlFor="paid-amount"
+                        htmlFor="tax_percent"
                         className="block mb-2 text-sm font-semibold text-gray"
                       >
                         Tax
                       </label>
                       <Input
                         type="number"
-                        id="paid-amount"
+                        id="tax_percent"
                         placeholder="Enter Tax"
-                        name="paid_amount"
-                        // value={formData.paid_amount}
-                        // onChange={handleChange}
-                        className={`${error?.data?.errors?.paid_amount && "border-red-500"}`}
+                        name="tax_percent"
+                        value={formData.tax_percent}
+                        onChange={handleChange}
+                        className={`${error?.data?.errors?.tax_percent && "border-red-500"}`}
                       />
-                      {error?.data?.errors?.paid_amount && <span className="text-red-500 text-sm">{error?.data?.errors?.paid_amount?.join('')}</span>}
+                      {error?.data?.errors?.tax_percent && <span className="text-red-500 text-sm">{error?.data?.errors?.tax_percent?.join('')}</span>}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="discount_percent"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Discount Amount %
+                      </label>
+                      <Input
+                        type="number"
+                        id="discount_percent"
+                        placeholder="Enter Discount %"
+                        name="discount_percent"
+                        value={formData.discount_percent}
+                        onChange={handleChange}
+                        className={`${error?.data?.errors?.discount_percent && "border-red-500"}`}
+                      />
+                      {error?.data?.errors?.discount_percent && <span className="text-red-500 text-sm">{error?.data?.errors?.discount_percent?.join('')}</span>}
                     </div>
 
                   </div>
@@ -432,9 +453,9 @@ const Invoice = () => {
                           <TableHead className="font-bold text-black dark:text-white">
                             Unit Price
                           </TableHead>
-                          <TableHead className="font-bold text-black dark:text-white">
+                          {/* <TableHead className="font-bold text-black dark:text-white">
                             Discount
-                          </TableHead>
+                          </TableHead> */}
                           <TableHead className="font-bold text-black dark:text-white">
                             Line Total
                           </TableHead>
@@ -486,7 +507,7 @@ const Invoice = () => {
                                 required
                               />
                             </TableCell>
-                            <TableCell>
+                            {/* <TableCell>
                               <Input
                                 type="number"
                                 placeholder="Enter Discount %"
@@ -495,7 +516,7 @@ const Invoice = () => {
                                 onChange={(e) => handleRowChange(e, index)}
                                 required
                               />
-                            </TableCell>
+                            </TableCell> */}
                             <TableCell>
                               <Input
                                 type="number"
