@@ -36,7 +36,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CirclePlus, Download, LoaderCircle } from "lucide-react";
+import { CirclePlus, Download, LoaderCircle, ReceiptPoundSterling, TextSearch } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAddInvoiceMutation, useGetInvoiceQuery, useGetInvoicesQuery } from "@/store/slices/apiSlice";
 import { toast } from "react-toastify";
@@ -50,6 +50,10 @@ const Invoice = () => {
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [filteredInvoice, setFilteredInvoice] = useState([]);
   const [inputSearchInvoice, setInputSearchInvoice] = useState('')
+  const [tax, setTax] = useState(0);
+  const [getGrandTotal, setGrandTotal] = useState(0);
+  const [pendingAmount, setPendingAmount] = useState(0);
+
 
   // RTK apis 
   const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery();
@@ -87,18 +91,56 @@ const Invoice = () => {
   }, [allInvoice]);
 
   // Handle form data change
+  useEffect(() => {
+    if (formData.paid_amount && getGrandTotal) {
+      const paidAmount = Number(formData.paid_amount);
+      const newPendingAmount = getGrandTotal - paidAmount;
+      setPendingAmount(newPendingAmount); // Update pending amount
+    }
+  }, [formData.paid_amount, getGrandTotal]);
+
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "tax_percent") {
+      const updatedTax = Number(value);
+      setTax(updatedTax);
+    }
     setFormData({ ...formData, [name]: value });
   };
 
   // Calculate line total
   const calculateLineTotal = (qty, unitPrice, discount) => {
+
     const total = qty * unitPrice;
     // const discountedTotal = total - (total * (discount / 100));
     // return discountedTotal.toFixed(1);
     return total;
   };
+
+  // Pass tax as a parameter to grandTotal
+  const grandTotal = (allItems, currentTax) => {
+    const totalUnitPrice = allItems.reduce((acc, singleItem) => {
+      return acc + Number(singleItem.unitPrice || 0);
+    }, 0);
+    if (currentTax) {
+      const totalTax = totalUnitPrice * (currentTax / 100);
+      setGrandTotal(totalUnitPrice + totalTax);
+      return totalUnitPrice + totalTax;
+    }
+
+    return totalUnitPrice;
+  };
+
+  // Example usage
+  useEffect(() => {
+    if (formData.items.length > 0) {
+      const total = grandTotal(formData.items, tax); // Pass tax explicitly
+      console.log("Grand Total:", total);
+    }
+  }, [formData.items, tax]); // Recalculate when items or tax change
+
 
   // Handle dynamic row change (for items)
   const handleRowChange = (e, index) => {
@@ -111,6 +153,7 @@ const Invoice = () => {
       }
       return item;
     });
+    grandTotal(updatedItems, tax)
     setFormData({ ...formData, items: updatedItems });
   };
 
@@ -194,6 +237,9 @@ const Invoice = () => {
     });
     setFilteredInvoice(filterInvoice);
   };
+
+
+
 
   return (
     <>
@@ -380,6 +426,110 @@ const Invoice = () => {
                       />
                       {error?.data?.errors?.payment_method && <span className="text-red-500 text-sm">{error?.data?.errors?.payment_method?.join('')}</span>}
                     </div>
+                    <div className="col-span-2">
+                      <div className="mt-4">
+                        <Table className="border light:border-gray-200 rounded-md">
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="font-bold text-black dark:text-white">
+                                Qty.
+                              </TableHead>
+                              <TableHead className="font-bold text-black dark:text-white">
+                                Item
+                              </TableHead>
+                              <TableHead className="font-bold text-black dark:text-white w-[250px]">
+                                Description
+                              </TableHead>
+                              <TableHead className="font-bold text-black dark:text-white">
+                                Unit Price
+                              </TableHead>
+                              {/* <TableHead className="font-bold text-black dark:text-white">
+                            Discount
+                          </TableHead> */}
+                              <TableHead className="font-bold text-black dark:text-white">
+                                Line Total
+                              </TableHead>
+                              <TableHead className="font-bold text-black dark:text-white">
+                                Add
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {formData.items.map((row, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    placeholder="Qty"
+                                    name="qty"
+                                    value={row.qty}
+                                    onChange={(e) => handleRowChange(e, index)}
+                                    required
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="text"
+                                    placeholder="Enter Item Name"
+                                    name="item"
+                                    value={row.item}
+                                    onChange={(e) => handleRowChange(e, index)}
+                                    required
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="text"
+                                    placeholder="Enter Description"
+                                    name="description"
+                                    value={row.description}
+                                    onChange={(e) => handleRowChange(e, index)}
+                                    required
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    placeholder="Enter Unit Price ₹"
+                                    name="unitPrice"
+                                    value={row.unitPrice}
+                                    onChange={(e) => handleRowChange(e, index)}
+                                    required
+                                  />
+                                </TableCell>
+                                {/* <TableCell>
+                              <Input
+                                type="number"
+                                placeholder="Enter Discount %"
+                                name="discount"
+                                value={row.discount}
+                                onChange={(e) => handleRowChange(e, index)}
+                                required
+                              />
+                            </TableCell> */}
+                                <TableCell>
+                                  <Input
+                                    type="number"
+                                    placeholder="Enter Line Total"
+                                    name="lineTotal"
+                                    value={row.lineTotal}
+                                    readOnly
+                                    disabled
+                                  />
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Button type="button" onClick={handleAddRow}>
+                                    <CirclePlus size={20} />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+
+
                     <div>
                       <label
                         htmlFor="paid-amount"
@@ -403,12 +553,12 @@ const Invoice = () => {
                         htmlFor="tax_percent"
                         className="block mb-2 text-sm font-semibold text-gray"
                       >
-                        Tax
+                        Tax %
                       </label>
                       <Input
                         type="number"
                         id="tax_percent"
-                        placeholder="Enter Tax"
+                        placeholder="Enter in percentage"
                         name="tax_percent"
                         value={formData.tax_percent}
                         onChange={handleChange}
@@ -421,12 +571,12 @@ const Invoice = () => {
                         htmlFor="discount_percent"
                         className="block mb-2 text-sm font-semibold text-gray"
                       >
-                        Discount Amount %
+                        Discount Amount
                       </label>
                       <Input
                         type="number"
                         id="discount_percent"
-                        placeholder="Enter Discount %"
+                        placeholder="Enter Discount"
                         name="discount_percent"
                         value={formData.discount_percent}
                         onChange={handleChange}
@@ -434,109 +584,41 @@ const Invoice = () => {
                       />
                       {error?.data?.errors?.discount_percent && <span className="text-red-500 text-sm">{error?.data?.errors?.discount_percent?.join('')}</span>}
                     </div>
-
+                    <div>
+                      <label
+                        htmlFor="grand-total"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Grand Total
+                      </label>
+                      <Input
+                        type="number"
+                        id="grand-total"
+                        placeholder="Get Grand Total"
+                        name="grand-total"
+                        value={getGrandTotal === 0 ? "" : getGrandTotal}
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="pending-amount"
+                        className="block mb-2 text-sm font-semibold text-gray"
+                      >
+                        Pending Amount
+                      </label>
+                      <Input
+                        type="number"
+                        id="pending-amount"
+                        placeholder="Pending Amount"
+                        name="pending-amount"
+                        value={pendingAmount}
+                        disabled
+                      />
+                    </div>
                   </div>
 
-                  <div className="mt-4">
-                    <Table className="border light:border-gray-200 rounded-md">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="font-bold text-black dark:text-white">
-                            Qty.
-                          </TableHead>
-                          <TableHead className="font-bold text-black dark:text-white">
-                            Item
-                          </TableHead>
-                          <TableHead className="font-bold text-black dark:text-white w-[250px]">
-                            Description
-                          </TableHead>
-                          <TableHead className="font-bold text-black dark:text-white">
-                            Unit Price
-                          </TableHead>
-                          {/* <TableHead className="font-bold text-black dark:text-white">
-                            Discount
-                          </TableHead> */}
-                          <TableHead className="font-bold text-black dark:text-white">
-                            Line Total
-                          </TableHead>
-                          <TableHead className="font-bold text-black dark:text-white">
-                            Add
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {formData.items.map((row, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                placeholder="Qty"
-                                name="qty"
-                                value={row.qty}
-                                onChange={(e) => handleRowChange(e, index)}
-                                required
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="text"
-                                placeholder="Enter Item Name"
-                                name="item"
-                                value={row.item}
-                                onChange={(e) => handleRowChange(e, index)}
-                                required
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="text"
-                                placeholder="Enter Description"
-                                name="description"
-                                value={row.description}
-                                onChange={(e) => handleRowChange(e, index)}
-                                required
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                placeholder="Enter Unit Price ₹"
-                                name="unitPrice"
-                                value={row.unitPrice}
-                                onChange={(e) => handleRowChange(e, index)}
-                                required
-                              />
-                            </TableCell>
-                            {/* <TableCell>
-                              <Input
-                                type="number"
-                                placeholder="Enter Discount %"
-                                name="discount"
-                                value={row.discount}
-                                onChange={(e) => handleRowChange(e, index)}
-                                required
-                              />
-                            </TableCell> */}
-                            <TableCell>
-                              <Input
-                                type="number"
-                                placeholder="Enter Line Total"
-                                name="lineTotal"
-                                value={row.lineTotal}
-                                readOnly
-                                disabled
-                              />
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <Button type="button" onClick={handleAddRow}>
-                                <CirclePlus size={20} />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+
                   <Button
                     type="submit"
                     className="mt-4 bg-green-600 font-extrabold"

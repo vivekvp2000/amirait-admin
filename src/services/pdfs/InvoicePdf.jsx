@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 
 // Invoice component
 const InvoicePdf = ({ data = {} }) => {
-    const { invoice_no, items, customer_address, customer_phone, payment_due_date, customer_name, custome_invoice_id, delivery_date, sub_total, tax, payment_method, name, quantity, sales_person, paid_amount, due_amount, grand_total } = data || {};
+    const { invoice_no, items, customer_address, customer_phone, payment_due_date, customer_name, custome_invoice_id, delivery_date, sub_total, tax, payment_method, discount_amount, name, quantity, sales_person, paid_amount, due_amount, grand_total } = data || {};
 
     return (
         <Document style={{ fontFamily: 'Helvetica' }}>
@@ -159,7 +159,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={styles.tableHeaderCell}>Item#</Text>
                         <Text style={styles.tableHeaderCell}>Description</Text>
                         <Text style={styles.tableHeaderCell}>Unit Price</Text>
-                        <Text style={styles.tableHeaderCell}>Discount</Text>
+                        {/* <Text style={styles.tableHeaderCell}>Discount</Text> */}
                         <Text style={styles.tableHeaderCell}>Sub Total</Text>
                     </View>
 
@@ -171,7 +171,7 @@ const InvoicePdf = ({ data = {} }) => {
                                 <Text style={styles.tableCell}>{item.name || '--'}</Text>
                                 <Text style={styles.tableCell}>{item.description || '--'}</Text>
                                 <Text style={styles.tableCell}> <Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.price || '--'}</Text>
-                                <Text style={styles.tableCell}>{item.discount + '%'}</Text>
+                                {/* <Text style={styles.tableCell}>{item.discount + '%'}</Text> */}
                                 <Text style={styles.tableCell}><Image src={rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.total || '--'}</Text>
                             </View>
                         </Fragment>
@@ -187,6 +187,18 @@ const InvoicePdf = ({ data = {} }) => {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", paddingHorizontal: 0, color: "#FFF",
                         }]}> <Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{sub_total || '--'}</Text>
+                    </View>
+
+                    <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 0 }}>
+                        <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>
+                        <Text style={[styles.totalCell, {
+                            flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
+                            borderTopColor: "#B0C4DE", paddingHorizontal: 0, color: "#FFF",
+                        }]}>Discount:</Text>
+                        <Text style={[styles.totalCell, {
+                            flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
+                            borderTopColor: "#B0C4DE", paddingHorizontal: 0, color: "#FFF",
+                        }]}> <Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{discount_amount || '--'}</Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 0 }}>
                         <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>
