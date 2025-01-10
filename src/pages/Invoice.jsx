@@ -53,8 +53,6 @@ const Invoice = () => {
   const [tax, setTax] = useState(0);
   const [getGrandTotal, setGrandTotal] = useState(0);
   const [pendingAmount, setPendingAmount] = useState(0);
-
-
   // RTK apis 
   const { data: allInvoice, isLoading: isInvoiceLoading } = useGetInvoicesQuery();
   const [addInvoice, { isLoading, error }] = useAddInvoiceMutation();
@@ -92,14 +90,13 @@ const Invoice = () => {
 
   // Handle form data change
   useEffect(() => {
-    if (formData.paid_amount && getGrandTotal) {
-      const paidAmount = Number(formData.paid_amount);
+    const paidAmount = Number(formData.paid_amount) || 0;
+
+    if (getGrandTotal) {
       const newPendingAmount = getGrandTotal - paidAmount;
-      setPendingAmount(newPendingAmount); // Update pending amount
+      setPendingAmount(newPendingAmount);
     }
   }, [formData.paid_amount, getGrandTotal]);
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -112,34 +109,31 @@ const Invoice = () => {
 
   // Calculate line total
   const calculateLineTotal = (qty, unitPrice, discount) => {
-
     const total = qty * unitPrice;
-    // const discountedTotal = total - (total * (discount / 100));
-    // return discountedTotal.toFixed(1);
     return total;
   };
 
   // Pass tax as a parameter to grandTotal
   const grandTotal = (allItems, currentTax) => {
     const totalUnitPrice = allItems.reduce((acc, singleItem) => {
-      return acc + Number(singleItem.unitPrice || 0);
+      return acc + Number(singleItem.lineTotal || 0);
     }, 0);
-    if (currentTax) {
-      const totalTax = totalUnitPrice * (currentTax / 100);
-      setGrandTotal(totalUnitPrice + totalTax);
-      return totalUnitPrice + totalTax;
+    if (!currentTax) {
+      setGrandTotal(totalUnitPrice);
+      console.log('Total Tax: 0');
+      console.log('Grand Total:', totalUnitPrice);
+      return totalUnitPrice;
     }
-
-    return totalUnitPrice;
+    const totalTax = totalUnitPrice * (currentTax / 100);
+    setGrandTotal(totalUnitPrice + totalTax);
+    return totalUnitPrice + totalTax;
   };
-
   // Example usage
   useEffect(() => {
     if (formData.items.length > 0) {
-      const total = grandTotal(formData.items, tax); // Pass tax explicitly
-      console.log("Grand Total:", total);
+      const total = grandTotal(formData.items, tax);
     }
-  }, [formData.items, tax]); // Recalculate when items or tax change
+  }, [formData.items, tax]);
 
 
   // Handle dynamic row change (for items)
@@ -614,6 +608,7 @@ const Invoice = () => {
                         name="pending-amount"
                         value={pendingAmount}
                         disabled
+                        className="text-red-600 "
                       />
                     </div>
                   </div>
