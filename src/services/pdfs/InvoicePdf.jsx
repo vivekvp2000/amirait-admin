@@ -143,7 +143,7 @@ const InvoicePdf = ({ data = {} }) => {
                 <View style={[styles.section, { flexDirection: "row", justifyContent: "space-between" }]}>
                     <View>
                         <Text>Payment Due: {payment_due_date || '--'}</Text>
-                        <Text>Salesperson:{sales_person || '--'}</Text>
+                        <Text>Project Manger:{sales_person || '--'}</Text>
                     </View>
                     <View>
                         <Text>Delivery Date: {delivery_date || '--'}</Text>
@@ -198,7 +198,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", paddingHorizontal: 0, color: "#FFF",
-                        }]}> <Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{discount_amount || '--'}</Text>
+                        }]}> <Image src={rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{discount_amount || '0'}</Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 0 }}>
                         <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>

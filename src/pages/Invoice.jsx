@@ -82,6 +82,7 @@ const Invoice = () => {
       },
     ],
   });
+
   useEffect(() => {
     if (allInvoice?.data) {
       setFilteredInvoice(allInvoice.data);
@@ -90,13 +91,14 @@ const Invoice = () => {
 
   // Handle form data change
   useEffect(() => {
-    const paidAmount = Number(formData.paid_amount) || 0;
-
-    if (getGrandTotal) {
-      const newPendingAmount = getGrandTotal - paidAmount;
-      setPendingAmount(newPendingAmount);
+    if (formData.items.length > 0) {
+      grandTotal(
+        formData.items,
+        Number(formData.tax_percent) || 0,
+        Number(formData.discount_percent) || 0
+      );
     }
-  }, [formData.paid_amount, getGrandTotal]);
+  }, [formData.items, formData.tax_percent, formData.discount_percent]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -108,32 +110,40 @@ const Invoice = () => {
   };
 
   // Calculate line total
-  const calculateLineTotal = (qty, unitPrice, discount) => {
+  const calculateLineTotal = (qty, unitPrice) => {
     const total = qty * unitPrice;
     return total;
   };
 
   // Pass tax as a parameter to grandTotal
-  const grandTotal = (allItems, currentTax) => {
+  const grandTotal = (allItems, currentTax, discount) => {
     const totalUnitPrice = allItems.reduce((acc, singleItem) => {
+      console.log(singleItem); // Check individual item details
       return acc + Number(singleItem.lineTotal || 0);
     }, 0);
-    if (!currentTax) {
-      setGrandTotal(totalUnitPrice);
-      console.log('Total Tax: 0');
-      console.log('Grand Total:', totalUnitPrice);
-      return totalUnitPrice;
-    }
     const totalTax = totalUnitPrice * (currentTax / 100);
-    setGrandTotal(totalUnitPrice + totalTax);
-    return totalUnitPrice + totalTax;
+    const totalWithTax = totalUnitPrice + totalTax;
+    const finalTotal = totalWithTax - discount;
+    setGrandTotal(finalTotal);
+    return finalTotal;
   };
+
   // Example usage
   useEffect(() => {
     if (formData.items.length > 0) {
-      const total = grandTotal(formData.items, tax);
+      const total = grandTotal(formData.items, tax, formData.discount_percent);
     }
   }, [formData.items, tax]);
+
+  useEffect(() => {
+    // Calculate pending amount dynamically when grand total or paid amount changes
+    const paidAmount = Number(formData.paid_amount) || 0;
+
+    if (getGrandTotal) {
+      const newPendingAmount = getGrandTotal - paidAmount;
+      setPendingAmount(newPendingAmount);
+    }
+  }, [formData.paid_amount, getGrandTotal]);
 
 
   // Handle dynamic row change (for items)
@@ -231,10 +241,6 @@ const Invoice = () => {
     });
     setFilteredInvoice(filterInvoice);
   };
-
-
-
-
   return (
     <>
       <div className="flex items-center justify-between">
