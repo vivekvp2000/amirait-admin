@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Helmet } from "react-helmet"
 
 const Proposal = () => {
     // RTK apis
@@ -67,6 +68,9 @@ const Proposal = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Amirait | Proposal</title>
+            </Helmet>
             <div className="flex items-center justify-between">
                 <Breadcrumb>
                     <BreadcrumbList>

@@ -1,14 +1,5 @@
-// import {
-//   Pagination,
-//   PaginationContent,
-//   PaginationEllipsis,
-//   PaginationItem,
-//   PaginationLink,
-//   PaginationNext,
-//   PaginationPrevious,
-// } from "@/components/ui/pagination"
-
-
+import { Skeleton } from "@/components/ui/skeleton"
+import { Helmet } from "react-helmet";
 import {
   Table,
   TableBody,
@@ -17,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -36,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CirclePlus, Download, LoaderCircle, ReceiptPoundSterling, TextSearch } from "lucide-react";
+import { CirclePlus, Download, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAddInvoiceMutation, useGetInvoiceQuery, useGetInvoicesQuery } from "@/store/slices/apiSlice";
 import { toast } from "react-toastify";
@@ -243,6 +233,9 @@ const Invoice = () => {
   };
   return (
     <>
+      <Helmet>
+        <title>Amirait | Invoice</title>
+      </Helmet>
       <div className="flex items-center justify-between">
         <Breadcrumb>
           <BreadcrumbList>
@@ -659,7 +652,7 @@ const Invoice = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {isInvoiceLoading && <h4>Invoice List Loading....</h4>}
+
             <Table className='w-full border light:border-gray-200'>
               <TableHeader className="bg-black ">
                 <TableRow>
@@ -672,26 +665,51 @@ const Invoice = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredInvoice.map((invoice, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="text-center font-medium">{invoice?.custome_invoice_id ? invoice?.custome_invoice_id : '---'}</TableCell>
-                    <TableCell className="text-center">{invoice?.customer_name}</TableCell>
-                    <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
-                    <TableCell className="text-center">{invoice?.grand_total}</TableCell>
-
-                    <TableCell className="text-center">{invoice?.sales_person}</TableCell>
-                    <TableCell className="text-center">
-                      <Button
-                        type="button"
-                        onClick={() => handleGetInvoice(invoice?.id)}
-                        className="bg-green-700 dark:text-white"
-                      >
-                        <Download />
-
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {isInvoiceLoading ? (
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell className="text-center mt-2">
+                        <Skeleton className="h-5 w-[100px]" />
+                      </TableCell>
+                      <TableCell className="text-center mt-2">
+                        <Skeleton className="h-5 w-[150px]" />
+                      </TableCell>
+                      <TableCell className="text-center mt-2">
+                        <Skeleton className="h-5 w-[120px]" />
+                      </TableCell>
+                      <TableCell className="text-center mt-2">
+                        <Skeleton className="h-5 w-[100px]" />
+                      </TableCell>
+                      <TableCell className="text-center mt-2">
+                        <Skeleton className="h-5 w-[150px]" />
+                      </TableCell>
+                      <TableCell className="text-center mt-2">
+                        <Skeleton className="h-5 w-[50px]" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  filteredInvoice.map((invoice, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="text-center font-medium">
+                        {invoice?.custome_invoice_id ? invoice?.custome_invoice_id : "---"}
+                      </TableCell>
+                      <TableCell className="text-center">{invoice?.customer_name}</TableCell>
+                      <TableCell className="text-center">{invoice?.delivery_date}</TableCell>
+                      <TableCell className="text-center">{invoice?.grand_total}</TableCell>
+                      <TableCell className="text-center">{invoice?.sales_person}</TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          type="button"
+                          onClick={() => handleGetInvoice(invoice?.id)}
+                          className="bg-green-700 dark:text-white"
+                        >
+                          <Download />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
             {/* <Pagination className='mt-4'>
