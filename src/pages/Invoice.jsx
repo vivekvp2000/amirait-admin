@@ -1,3 +1,11 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { Skeleton } from "@/components/ui/skeleton"
 import { Helmet } from "react-helmet";
 import {
@@ -61,6 +69,7 @@ const Invoice = () => {
     paid_amount: "",
     tax_percent: "",
     discount_percent: '',
+    invoice_curreny: '',
     items: [
       {
         qty: "",
@@ -72,6 +81,7 @@ const Invoice = () => {
       },
     ],
   });
+  console.log('Form Data', formData)
 
   useEffect(() => {
     if (allInvoice?.data) {
@@ -92,12 +102,21 @@ const Invoice = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(value)
     if (name === "tax_percent") {
       const updatedTax = Number(value);
       setTax(updatedTax);
     }
     setFormData({ ...formData, [name]: value });
   };
+
+  const handleSelectChange = (value) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      invoice_curreny: value,
+    }));
+  };
+
 
   // Calculate line total
   const calculateLineTotal = (qty, unitPrice) => {
@@ -264,11 +283,25 @@ const Invoice = () => {
                   <h2 className="text-2xl font-semibold leading-none tracking-tight">
                     Invoice
                   </h2>
+
                 </CardTitle>
                 <CardDescription>
-                  <p className="text-sm text-muted-foreground">
-                    Create Your Invoice Here
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Create Your Invoice Here
+                    </p>
+                    <Select name="invoice_curreny" onValueChange={handleSelectChange}
+                      value={formData.invoice_curreny} >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select Currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="INR">INR</SelectItem>
+                        <SelectItem value="USD">USD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                 </CardDescription>
               </CardHeader>
               <CardContent>

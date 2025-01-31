@@ -12,7 +12,6 @@ import PageLoader from "./components/PageLoader";
 const Invoice = lazy(() => import("./pages/Invoice"));
 const Proposal = lazy(() => import("./pages/Proposal"));
 
-
 function App() {
   return (
     <Routes basename="/">

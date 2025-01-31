@@ -135,7 +135,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.headerText, { marginBottom: 8 }]}>Bill From</Text>
                         <Text>Recipient: Amirait™ Dev Rise Global Technologies Pvt Ltd</Text>
                         <Text>Address: Phase 1, Saharanpur Rd, Shakti Vihar, Majra, Dehradun</Text>
-                        <Text>Phone: +91 7017986097</Text>
+                        <Text>Phone: +91 7078980097</Text>
                     </View>
                 </View>
 
@@ -253,7 +253,7 @@ const InvoicePdf = ({ data = {} }) => {
                     <Text>
                         Amirait™ Dev Rise Global Technologies Pvt Ltd
                         {"\n"}Phase-1, Saharanpur Rd, Shakti Vihar, Majra, Dehradun
-                        {"\n"}P.No. +91 7017986097 | info@amirait.com
+                        {"\n"}P.No. +91 7078980097 | info@amirait.com
                     </Text>
                 </View>
             </Page>

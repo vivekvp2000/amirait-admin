@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { Helmet } from "react-helmet";
 export function HomePage() {
   return (
     <>
+      <Helmet>
+        <title>Amirait | Home</title>
+      </Helmet>
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
       </div>
