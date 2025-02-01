@@ -81,7 +81,6 @@ const Invoice = () => {
       },
     ],
   });
-  console.log('Form Data', formData)
 
   useEffect(() => {
     if (allInvoice?.data) {
@@ -117,7 +116,6 @@ const Invoice = () => {
     }));
   };
 
-
   // Calculate line total
   const calculateLineTotal = (qty, unitPrice) => {
     const total = qty * unitPrice;
@@ -127,7 +125,6 @@ const Invoice = () => {
   // Pass tax as a parameter to grandTotal
   const grandTotal = (allItems, currentTax, discount) => {
     const totalUnitPrice = allItems.reduce((acc, singleItem) => {
-      console.log(singleItem); // Check individual item details
       return acc + Number(singleItem.lineTotal || 0);
     }, 0);
     const totalTax = totalUnitPrice * (currentTax / 100);
