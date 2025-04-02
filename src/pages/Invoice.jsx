@@ -295,6 +295,7 @@ const Invoice = () => {
                       <SelectContent>
                         <SelectItem value="INR">INR</SelectItem>
                         <SelectItem value="USD">USD</SelectItem>
+                        <SelectItem value="EURO">EURO</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

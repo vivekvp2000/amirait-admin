@@ -2,11 +2,14 @@ import { Fragment } from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 import logo from "@assets/images/logo.png";
+import bgLogo from "@assets/images/bg-logo.png";
+
 import rupeIcon from "@assets/icons/rupee.png";
 import rupeIconWhite from "@assets/icons/rupeewhite.png";
 import dollerIcon from "@assets/icons/dollar.png";
 import dollerIconWhite from "@assets/icons/dollarwhite.png";
-import bgLogo from "@assets/images/bg-logo.png";
+import euroDark from "@assets/icons/euro-dark.png";
+import euroWhite from "@assets/icons/euro-white.png";
 
 // Define styles
 const styles = StyleSheet.create({
@@ -104,7 +107,18 @@ const styles = StyleSheet.create({
 const InvoicePdf = ({ data = {} }) => {
     const { invoice_no, items, customer_address, customer_phone, payment_due_date, customer_name, custome_invoice_id, delivery_date, sub_total, tax, payment_method, discount_amount, invoice_curreny, sales_person, paid_amount, due_amount, grand_total } = data || {};
 
-    console.log(invoice_curreny)
+
+    const currencyIconsDark = {
+        USD: dollerIcon,
+        INR: rupeIcon,
+        EURO: euroDark,
+    };
+
+    const currencyIconsWhite = {
+        USD: dollerIconWhite,
+        INR: rupeIconWhite,
+        EURO: euroWhite,
+    };
     return (
         <Document style={{ fontFamily: 'Helvetica' }}>
             <Page size="A4" style={styles.page}>
@@ -173,9 +187,9 @@ const InvoicePdf = ({ data = {} }) => {
                                 <Text style={styles.tableCell}>{item.quantity || '--'}</Text>
                                 <Text style={styles.tableCell}>{item.name || '--'}</Text>
                                 <Text style={styles.tableCell}>{item.description || '--'}</Text>
-                                <Text style={styles.tableCell}> <Image src={invoice_curreny === 'USD' ? dollerIcon : rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.price || '--'}</Text>
+                                <Text style={styles.tableCell}> <Image src={currencyIconsDark[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.price || '--'}</Text>
                                 {/* <Text style={styles.tableCell}>{item.discount + '%'}</Text> */}
-                                <Text style={styles.tableCell}><Image src={invoice_curreny === 'USD' ? dollerIcon : rupeIcon} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.total || '--'}</Text>
+                                <Text style={styles.tableCell}><Image src={currencyIconsDark[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{item.total || '--'}</Text>
                             </View>
                         </Fragment>
                     ))}
@@ -189,7 +203,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", paddingHorizontal: 0, color: "#FFF",
-                        }]}> <Image src={invoice_curreny === 'USD' ? dollerIconWhite : rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{sub_total || '--'}</Text>
+                        }]}> <Image src={currencyIconsWhite[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{sub_total || '--'}</Text>
                     </View>
 
                     <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 0 }}>
@@ -201,7 +215,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", paddingHorizontal: 0, color: "#FFF",
-                        }]}> <Image src={invoice_curreny === 'USD' ? dollerIconWhite : rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{discount_amount || '0'}</Text>
+                        }]}> <Image src={currencyIconsWhite[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{discount_amount || '0'}</Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 0 }}>
                         <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>
@@ -212,7 +226,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", color: "#FFF", paddingHorizontal: 0
-                        }]}> <Image src={invoice_curreny === 'USD' ? dollerIconWhite : rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{tax}</Text>
+                        }]}> <Image src={currencyIconsWhite[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{tax}</Text>
                     </View>
                     <View style={{ display: 'flex', paddingHorizontal: 0, flexDirection: 'row', }}>
                         <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>
@@ -223,7 +237,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", color: "#FFF", paddingHorizontal: 0
-                        }]}> <Image src={invoice_curreny === 'USD' ? dollerIconWhite : rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{grand_total || '--'}</Text>
+                        }]}> <Image src={currencyIconsWhite[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{grand_total || '--'}</Text>
                     </View>
                     <View style={{ display: 'flex', paddingHorizontal: 0, flexDirection: 'row' }}>
                         <Text style={[styles.totalCell, { flex: 4, borderLeft: 'none', borderBottom: 'none', paddingHorizontal: 0 }]}></Text>
@@ -234,7 +248,7 @@ const InvoicePdf = ({ data = {} }) => {
                         <Text style={[styles.totalCell, {
                             flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                             borderTopColor: "#B0C4DE", color: "#FFF", paddingHorizontal: 0
-                        }]}> <Image src={invoice_curreny === 'USD' ? dollerIconWhite : rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{paid_amount || '--'}</Text>
+                        }]}> <Image src={currencyIconsWhite[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{paid_amount || '--'}</Text>
                     </View>
                     {
                         due_amount && <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 0 }}>
@@ -246,7 +260,7 @@ const InvoicePdf = ({ data = {} }) => {
                             <Text style={[styles.totalCell, {
                                 flex: 1, backgroundColor: "#6C7AE0", textAlign: 'center', marginBottom: 0, borderTopWidth: 1,
                                 borderTopColor: "#B0C4DE", color: "#FFF", paddingHorizontal: 0
-                            }]}> <Image src={invoice_curreny === 'USD' ? dollerIconWhite : rupeIconWhite} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{due_amount || '--'}</Text>
+                            }]}> <Image src={currencyIconsWhite[invoice_curreny] || null} style={{ width: 10, height: 8, objectFit: 'contain' }}></Image>{due_amount || '--'}</Text>
                         </View>
                     }
                 </View>
